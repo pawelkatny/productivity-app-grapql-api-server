@@ -7,6 +7,7 @@ dotenv.config({
 
 module.exports = {
   NODE_ENV: process.env.NODE_ENV || "local",
+  API_PATH: process.env.API_PATH,
   PORT: process.env.PORT,
   MONGO_URL: process.env.MONGO_DB_URL,
 };

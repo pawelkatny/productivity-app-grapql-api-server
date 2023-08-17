@@ -35,7 +35,7 @@ module.exports = {
   start: async () => {
     await server.start();
     app.use(
-      "/graphql",
+      `/${config.API_PATH}`,
       cors(),
       bodyParser.json(),
       expressMiddleware(server, {
@@ -47,6 +47,8 @@ module.exports = {
       httpServer.listen({ port: config.PORT }, resolve)
     );
 
-    console.log(`🚀 Server ready at http://localhost:${config.PORT}/`);
+    console.log(
+      `🚀 Server ready at http://localhost:${config.PORT}/${config.API_PATH}`
+    );
   },
 };
