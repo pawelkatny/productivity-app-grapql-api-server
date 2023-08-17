@@ -1,12 +1,10 @@
-const config = require("./config");
-const express = require("express");
-const app = express();
-const port = 3000;
+const { db, express } = require("./loaders");
 
-app.get("/", (res, req) => {
-  res.send("Productivity app");
-});
-
-app.listen(port, () => {
-  console.log(`Server started at PORT ${port}.`);
-});
+(async () => {
+  try {
+    await db.connect();
+    await express.start();
+  } catch (error) {
+    console.log("Failed to start the server: ", error);
+  }
+})();
