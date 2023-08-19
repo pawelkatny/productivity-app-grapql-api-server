@@ -1,4 +1,5 @@
 const config = require("../config");
+const schema = require("./schema");
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const {
@@ -8,7 +9,6 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -25,8 +25,7 @@ const resolvers = {
 };
 
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+  schema,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 

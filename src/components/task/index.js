@@ -6,3 +6,8 @@ const resolvers = require("./resolvers");
 const typeDefs = loadSchemaSync(path.resolve(__dirname, "types.graphql"), {
   loaders: [new GraphQLFileLoader()],
 });
+
+module.exports = {
+  resolvers,
+  typeDefs,
+};
