@@ -8,7 +8,6 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const { resolve } = require("path");
 
 const app = express();
 const httpServer = http.createServer(app);

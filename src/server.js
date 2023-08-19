@@ -1,4 +1,5 @@
 const { db, express } = require("./loaders");
+const task = require("./components/task/index");
 
 (async () => {
   try {
