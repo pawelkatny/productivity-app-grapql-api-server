@@ -10,4 +10,5 @@ module.exports = {
   API_PATH: process.env.API_PATH,
   PORT: process.env.PORT,
   MONGO_URL: process.env.MONGO_DB_URL,
+  BCRYPT_SALT: process.env.BCRYPT_SAL,
 };
