@@ -68,7 +68,7 @@ const userSchema = mongoose.Schema(
 userSchema.pre("save", async function () {
   const updatedFields = this.modifiedPaths();
   if (updatedFields.includes("password")) {
-    const salt = await bcrypt.salt(BCRYPT_SALT);
+    const salt = await bcrypt.genSalt(BCRYPT_SALT);
     this.password = await bcrypt.hash(this.password, salt);
   }
 });

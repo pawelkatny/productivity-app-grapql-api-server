@@ -6,7 +6,6 @@ let db = undefined;
 const start = async () => {
   db = await MongoMemoryServer.create();
   const URI = db.getUri();
-  db.stop;
   await mongoose.connect(URI);
 };
 

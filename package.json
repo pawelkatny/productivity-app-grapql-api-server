@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watchAll --detectOpenHandles",
     "local": "export NODE_ENV=local && nodemon ./src/server.js"
   },
   "keywords": [],
@@ -26,7 +26,9 @@
   },
   "devDependencies": {
     "@jest/types": "^29.6.3",
+    "@types/jest": "^29.5.4",
     "@types/mongoose": "^5.11.97",
+    "jest": "^29.6.3",
     "mongodb-memory-server": "^8.15.1",
     "nodemon": "^3.0.1"
   }
