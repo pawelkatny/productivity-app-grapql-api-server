@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const { jwt } = require("../../helpers");
-const { BCRYPT_SALT, JWT_SECRECT, JWT_EXPIRATION } = require("../../config");
+const { BCRYPT_SALT, JWT_SECRET, JWT_EXPIRATION } = require("../../config");
 
 const userSchema = mongoose.Schema(
   {
