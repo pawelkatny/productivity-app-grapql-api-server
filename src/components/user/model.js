@@ -79,7 +79,7 @@ userSchema.methods.comparePwd = async function (inputPwd) {
 };
 
 userSchema.methods.createAuthToken = async function () {
-  const token = await jwt.sign({ id: this._id }, JWT_SECRECT, {
+  const token = await jwt.sign({ userId: this._id }, JWT_SECRET, {
     expiresIn: JWT_EXPIRATION,
   });
   return token;
