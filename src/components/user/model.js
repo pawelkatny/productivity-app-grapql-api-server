@@ -18,6 +18,7 @@ const userSchema = mongoose.Schema(
         "Email address is not valid.",
       ],
       required: [true, "Email is required."],
+      unique: true,
       maxlength: 50,
     },
 
