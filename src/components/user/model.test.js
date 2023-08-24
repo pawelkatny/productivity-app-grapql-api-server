@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const User = require("./model");
 const { jwt } = require("../../helpers");
 const { BCRYPT_SALT, JWT_SECRET, JWT_EXPIRATION } = require("../../config");
+const { default: mongoose } = require("mongoose");
 
 jest.mock("../../config", () => ({
   BCRYPT_SALT: 10,
@@ -10,24 +11,26 @@ jest.mock("../../config", () => ({
   JWT_EXPIRATION: "1h",
 }));
 
-beforeAll(async () => {
-  await dbServer.start();
-  await User.create({
-    name: "Default user",
-    email: "default@test.com",
-    password: "password",
-  });
-});
-
-afterAll(async () => {
-  await dbServer.stop();
-});
+const defaultUser = {
+  name: "Default user",
+  email: "default@test.com",
+  password: "password",
+};
 
 const mockNewUser = {
   name: "Test user",
   email: "test@email.com",
   password: "testPassword",
 };
+
+beforeAll(async () => {
+  await dbServer.start();
+  await User.create(defaultUser);
+});
+
+afterAll(async () => {
+  await dbServer.stop();
+});
 
 describe("User model", () => {
   it("should create user and hash password on pre save", async () => {
@@ -53,5 +56,19 @@ describe("User model", () => {
       expiresIn: JWT_EXPIRATION,
     });
     expect(token).toBe("jwt_token");
+  });
+
+  it("should throw duplicate key error when creating user with already used email", async () => {
+    jest.spyOn(User, "create");
+    let newUser, error;
+
+    try {
+      newUser = await User.create(defaultUser);
+    } catch (err) {
+      error = err;
+    }
+
+    expect(newUser).toBeFalsy();
+    expect(error.code).toBe(11000);
   });
 });
