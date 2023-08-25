@@ -20,6 +20,7 @@ const userSchema = mongoose.Schema(
       ],
       required: [true, "Email is required."],
       unique: true,
+      minlength: 4,
       maxlength: 50,
     },
 
