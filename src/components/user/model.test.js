@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const User = require("./model");
 const { jwt } = require("../../helpers");
 const { BCRYPT_SALT, JWT_SECRET, JWT_EXPIRATION } = require("../../config");
-const { default: mongoose } = require("mongoose");
 
 jest.mock("../../config", () => ({
   BCRYPT_SALT: 10,
@@ -70,5 +69,19 @@ describe("User model", () => {
 
     expect(newUser).toBeFalsy();
     expect(error.code).toBe(11000);
+  });
+
+  it("should throw error on invalid email address", async () => {
+    jest.spyOn(User, "create");
+    let newUser, error;
+
+    try {
+      newUser = await User.create({ ...mockNewUser, email: "wrong email" });
+    } catch (err) {
+      error = err;
+    }
+
+    expect(newUser).toBeFalsy();
+    expect(error.errors["email"].message).toBe("Email address is not valid.");
   });
 });
