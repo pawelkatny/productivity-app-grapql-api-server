@@ -1,5 +1,6 @@
 const config = require("../config");
 const schema = require("./schema");
+const context = require("../context");
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const {
@@ -37,7 +38,7 @@ module.exports = {
       cors(),
       bodyParser.json(),
       expressMiddleware(server, {
-        context: async ({ req }) => ({ data: "CONTEXT" }),
+        context: async ({ req }) => ({ db: context.db }),
       })
     );
 
