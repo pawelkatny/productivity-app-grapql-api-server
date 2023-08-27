@@ -3,10 +3,14 @@ type AuthUser {
   token: String!
 }
 
-type RegisterUserInput {
+input RegisterUserInput {
   name: String!
   email: String!
   password: String!
+}
+
+type Mutation {
+  registerUser(input: RegisterUserInput!): AuthUser!
 }
 
 type Query {
