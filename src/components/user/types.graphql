@@ -3,6 +3,12 @@ type AuthUser {
   token: String!
 }
 
+type RegisterUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
 type Query {
   user: String
 }
