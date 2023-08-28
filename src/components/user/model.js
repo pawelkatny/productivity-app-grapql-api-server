@@ -30,22 +30,6 @@ const userSchema = mongoose.Schema(
       maxlength: 72,
     },
 
-    active: {
-      type: Boolean,
-      default: false,
-    },
-
-    accountActivation: {
-      token: {
-        type: String,
-        default: null,
-        maxlength: 24,
-      },
-      expireAt: {
-        type: Date,
-      },
-    },
-
     passwordReset: {
       token: {
         type: String,
