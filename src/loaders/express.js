@@ -12,6 +12,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -40,7 +41,10 @@ module.exports = {
       cors(),
       bodyParser.json(),
       expressMiddleware(server, {
-        context: async ({ req }) => ({ db: context.db }),
+        context: async ({ req }) => ({
+          authUser: await context.authUser(req),
+          db: context.db,
+        }),
       })
     );
 
