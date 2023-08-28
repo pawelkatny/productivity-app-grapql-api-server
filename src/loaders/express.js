@@ -28,9 +28,7 @@ const server = new ApolloServer({
       };
     }
 
-    // Otherwise return the formatted error. This error can also
-    // be manipulated in other ways, as long as it's returned.
-    return { ...formattedError, http: error.http };
+    return { ...formattedError, http: { ...error.extensions.http } };
   },
 });
 
