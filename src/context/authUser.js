@@ -1,6 +1,6 @@
-const { JWT_SECRET, JWT_EXPIRATION } = require("../config");
+const { JWT_SECRET } = require("../config");
 const { jwt } = require("../helpers");
-const { db: User } = require("./index");
+const User = require("../components/user/model");
 
 const authUser = async (req) => {
   const authorization = req.headers.authorization;
