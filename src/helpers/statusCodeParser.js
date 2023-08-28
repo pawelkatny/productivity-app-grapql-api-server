@@ -2,7 +2,7 @@ const { getReasonPhrase } = require("http-status-codes");
 
 const parseStatusCode = (code) => {
   return getReasonPhrase(code)
-    .replace(/+*?^$()[]{}|\`\'/, "")
+    .replace(/[+*?^$()[]{}'|\`]/, "")
     .replace("/s/", "_")
     .toUpperCase();
 };
