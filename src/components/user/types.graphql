@@ -1,6 +1,11 @@
+type Token {
+  accessToken: String!
+  expiresIn: String!
+  type: String!
+}
 type AuthUser {
   name: String!
-  token: String!
+  token: Token!
 }
 
 input RegisterUserInput {
