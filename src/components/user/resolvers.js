@@ -1,3 +1,4 @@
+const { JWT_EXPIRATION, JWT_TYPE } = require("../../config");
 const { parseStatusCode } = require("../../helpers");
 const { StatusCodes } = require("http-status-codes");
 const { GraphQLError } = require("graphql");
@@ -24,11 +25,15 @@ module.exports = {
       }
 
       user = await User.create({ ...input });
-      const authToken = await user.createAuthToken();
+      const accessToken = await user.createAuthToken();
 
       return {
         name: user.name,
-        token: authToken,
+        token: {
+          accessToken,
+          expiresIn: JWT_EXPIRATION,
+          type: JWT_TYPE,
+        },
       };
     },
   },
