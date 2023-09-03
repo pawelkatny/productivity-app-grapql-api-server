@@ -1,4 +1,4 @@
-const dbServer = require("../../helpers/dbServer");
+const dbServer = require("../../helpers/mockDbServer");
 const bcrypt = require("bcryptjs");
 const User = require("./model");
 const { jwt } = require("../../helpers");
