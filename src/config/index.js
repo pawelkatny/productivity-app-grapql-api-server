@@ -10,4 +10,8 @@ module.exports = {
   API_PATH: process.env.API_PATH,
   PORT: process.env.PORT,
   MONGO_URL: process.env.MONGO_DB_URL,
+  BCRYPT_SALT: process.env.BCRYPT_SALT,
+  JWT_SECRET: process.env.JWT_SECRECT,
+  JWT_EXPIRATION: process.env.JWT_EXPIRATION,
+  JWT_TYPE: process.env.JWT_TYPE,
 };

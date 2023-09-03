@@ -1,3 +1,23 @@
+type Token {
+  accessToken: String!
+  expiresIn: String!
+  type: String!
+}
+type AuthUser {
+  name: String!
+  token: Token!
+}
+
+input RegisterUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  registerUser(input: RegisterUserInput!): AuthUser!
+}
+
 type Query {
   user: String
 }
