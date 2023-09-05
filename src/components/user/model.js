@@ -20,14 +20,21 @@ const userSchema = mongoose.Schema(
       ],
       required: [true, "Email is required."],
       unique: true,
-      minlength: 4,
-      maxlength: 50,
+      minlength: [4, "Email must be at least 4 characters long, got {VALUE}."],
+      maxlength: [50, "Email must be at max 50 characters long, got {VALUE}."],
     },
 
     password: {
       type: String,
       required: [true, "Password is required."],
-      maxlength: 72,
+      minlength: [
+        6,
+        "Password must be at least 4 characters long, got {VALUE}.",
+      ],
+      maxlength: [
+        72,
+        "Password must be at max 72 characters long, got {VALUE}.",
+      ],
     },
 
     passwordReset: {
