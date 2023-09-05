@@ -13,12 +13,18 @@ jest.mock("../../config", () => ({
 const defaultUser = {
   name: "Default user",
   email: "default@test.com",
-  password: "password",
+  password: "paS$w0rd",
 };
 
 const mockNewUser = {
   name: "Test user",
   email: "test@email.com",
+  password: "testPassworD1!",
+};
+
+const mockNewUserInvalidPwd = {
+  name: "Test user",
+  email: "test2@email.com",
   password: "testPassword",
 };
 
@@ -83,5 +89,22 @@ describe("User model", () => {
 
     expect(newUser).toBeFalsy();
     expect(error.errors["email"].message).toBe("Email address is not valid.");
+  });
+
+  it("should throw error on password doesn`t match required pattern", async () => {
+    jest.spyOn(User, "create");
+    let newUser, error;
+
+    try {
+      newUser = await User.create({ ...mockNewUserInvalidPwd });
+    } catch (err) {
+      error = err;
+      q;
+    }
+
+    expect(newUser).toBeFalsy();
+    expect(error.errors["password"].message).toBe(
+      "Password should contain at least: one uppercase character, one lowercase character, one digit and one special character (@$!%*?&)."
+    );
   });
 });

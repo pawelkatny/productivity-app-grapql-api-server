@@ -8,8 +8,8 @@ const userSchema = mongoose.Schema(
     name: {
       type: String,
       required: [true, "Name is required."],
-      minlength: [5, "Name must be at least 5 characters long, got {VALUE}."],
-      maxlength: [50, "Name must be at max 50 characters long, got {VALUE}."],
+      minlength: [5, "Name must be at least 5 characters long."],
+      maxlength: [50, "Name must be at max 50 characters long."],
     },
 
     email: {
@@ -20,8 +20,8 @@ const userSchema = mongoose.Schema(
       ],
       required: [true, "Email is required."],
       unique: true,
-      minlength: [4, "Email must be at least 4 characters long, got {VALUE}."],
-      maxlength: [50, "Email must be at max 50 characters long, got {VALUE}."],
+      minlength: [4, "Email must be at least 4 characters long."],
+      maxlength: [50, "Email must be at max 50 characters long."],
     },
 
     password: {
@@ -36,14 +36,8 @@ const userSchema = mongoose.Schema(
             "Password should contain at least: one uppercase character, one lowercase character, one digit and one special character (@$!%*?&).",
         },
       ],
-      minlength: [
-        6,
-        "Password must be at least 6 characters long, got {VALUE}.",
-      ],
-      maxlength: [
-        72,
-        "Password must be at max 72 characters long, got {VALUE}.",
-      ],
+      minlength: [6, "Password must be at least 6 characters long."],
+      maxlength: [72, "Password must be at max 72 characters long."],
     },
 
     passwordReset: {
