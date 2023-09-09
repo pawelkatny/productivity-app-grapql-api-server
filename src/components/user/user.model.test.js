@@ -99,7 +99,6 @@ describe("User model", () => {
       newUser = await User.create({ ...mockNewUserInvalidPwd });
     } catch (err) {
       error = err;
-      q;
     }
 
     expect(newUser).toBeFalsy();

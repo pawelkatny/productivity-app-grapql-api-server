@@ -41,7 +41,7 @@ const server = new ApolloServer({
           path: originalError.errors[err].path,
         });
       }
-      extensions.code = ApolloServerErrorCode.BAD_USER_INPUT;
+      extensions.code = ApolloServerErrorCode.BAD_REQUEST;
       extensions.http = {
         status: StatusCodes.BAD_REQUEST,
       };
