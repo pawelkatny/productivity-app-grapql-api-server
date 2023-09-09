@@ -21,6 +21,7 @@ input LoginUserInput {
 
 type Mutation {
   registerUser(input: RegisterUserInput!): AuthUser!
+  loginUser(input: LoginUserInput!): AuthUser!
 }
 
 type Query {
