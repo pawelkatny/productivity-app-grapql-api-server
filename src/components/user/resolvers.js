@@ -25,16 +25,9 @@ module.exports = {
       }
 
       user = await User.create({ ...input });
-      const accessToken = await user.createAuthToken();
+      const token = await user.createAuthToken();
 
-      return {
-        name: user.name,
-        token: {
-          accessToken,
-          expiresIn: JWT_EXPIRATION,
-          type: JWT_TYPE,
-        },
-      };
+      return token;
     },
     loginUser: async (
       parent,
