@@ -61,16 +61,9 @@ module.exports = {
         });
       }
 
-      const accessToken = await user.createAuthToken();
+      const token = await user.createAuthToken();
 
-      return {
-        name: user.name,
-        token: {
-          accessToken,
-          expiresIn: JWT_EXPIRATION,
-          type: JWT_TYPE,
-        },
-      };
+      return token;
     },
   },
 };
