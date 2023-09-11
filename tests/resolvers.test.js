@@ -3,6 +3,7 @@ const dbServer = require("../src/helpers/mockDbServer");
 const context = require("../src/context");
 const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { jwt } = require("../src/helpers");
+const { StatusCodes } = require("http-status-codes");
 
 let server;
 
@@ -118,6 +119,33 @@ describe("User resolver", () => {
       expect(res.body.singleResult.errors).toBeFalsy();
       expect(res.body.singleResult.data.loginUser.token.accessToken).toEqual(
         "accessToken"
+      );
+    });
+
+    it("should throw error when email not found", async () => {
+      const loginUserInput = {
+        email: mockUserInputIncorrectData.email,
+        password: mockUserInputIncorrectData.password,
+      };
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { name }}`,
+          variables: {
+            input: loginUserInput,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.data).toBeNull();
+      expect(res.body.singleResult.errors).toBeDefined();
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "UNAUTHORIZED"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        StatusCodes.UNAUTHORIZED
       );
     });
   });
