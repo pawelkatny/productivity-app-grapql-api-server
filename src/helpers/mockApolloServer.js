@@ -11,8 +11,8 @@ const create = () => {
   const server = new ApolloServer({
     schema,
     formatError: (formattedError, error) => {
-      const { message, extensions } = formattedError;
       const originalError = unwrapResolverError(error);
+      const { message, extensions } = error;
       let errorsPretty = [];
 
       if (extensions.code === ApolloServerErrorCode.INTERNAL_SERVER_ERROR) {
