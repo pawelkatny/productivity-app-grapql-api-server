@@ -26,6 +26,7 @@ input DeleteUserInput {
 type Mutation {
   registerUser(input: RegisterUserInput!): AuthUser!
   loginUser(input: LoginUserInput!): AuthUser!
+  deleteUser(input: DeleteUserInput!): Boolean
 }
 
 type Query {
