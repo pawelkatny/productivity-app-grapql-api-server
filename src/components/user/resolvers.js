@@ -65,5 +65,35 @@ module.exports = {
 
       return token;
     },
+    deleteUser: async (parent, { input }, { authUser, db: { User } }, info) => {
+      if (!authUser) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
+            http: {
+              status: StatusCodes.UNAUTHORIZED,
+            },
+          },
+        });
+      }
+
+      const user = await User.findById(authUser.userId);
+
+      if (!user) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.NOT_FOUND), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.NOT_FOUND),
+            http: {
+              status: StatusCodes.NOT_FOUND,
+            },
+          },
+        });
+      }
+
+      await User.findByIdAndDelete(authUser.userId);
+      const userExists = await User.exists({ _id: authUser.userId });
+
+      return !userExists ? true : false;
+    },
   },
 };
