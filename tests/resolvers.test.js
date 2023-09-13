@@ -78,19 +78,20 @@ describe("User resolver", () => {
 
     expect(res.body.singleResult.data).toBeNull();
     expect(res.body.singleResult.errors).toBeDefined();
-    expect(res.body.singleResult.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          errorsPretty: [
-            {
-              message:
-                "Password should contain at least: one uppercase character, one lowercase character, one digit and one special character (@$!%*?&).",
-              path: "password",
-            },
-          ],
-        }),
-      ])
-    );
+
+    const errObject = expect.objectContaining({
+      errorsPretty: [
+        {
+          message:
+            "Password should contain at least: one uppercase character, one lowercase character, one digit and one special character (@$!%*?&).",
+          path: "password",
+        },
+      ],
+    });
+
+    const errArrContainer = expect.arrayContaining([errObject]);
+
+    expect(res.body.singleResult.errors).toEqual(errArrContainer);
     expect(res.body.singleResult.errors[0].extensions.code).toEqual(
       ApolloServerErrorCode.BAD_REQUEST
     );
