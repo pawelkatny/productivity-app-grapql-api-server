@@ -2,6 +2,7 @@ const { JWT_EXPIRATION, JWT_TYPE } = require("../../config");
 const { parseStatusCode } = require("../../helpers");
 const { StatusCodes, getReasonPhrase } = require("http-status-codes");
 const { GraphQLError } = require("graphql");
+const Task = require("../task/model");
 
 module.exports = {
   Query: {
@@ -103,6 +104,7 @@ module.exports = {
         });
       }
 
+      await Task.deleteMany({ user: authUser.userId });
       await User.findByIdAndDelete(authUser.userId);
       const userExists = await User.exists({ _id: authUser.userId });
 
