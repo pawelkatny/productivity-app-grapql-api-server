@@ -223,7 +223,6 @@ describe("User resolver", () => {
       expect(taskDeleteMany).toBeCalledWith({ user: authUser.userId });
       expect(userFindByIdAndDelete).toBeCalledWith(authUser.userId);
       expect(res.body.singleResult.data.deleteUser).toEqual(true);
-      console.log(res.body.singleResult);
     });
   });
 });
