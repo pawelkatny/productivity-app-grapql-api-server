@@ -90,6 +90,19 @@ module.exports = {
         });
       }
 
+      const isPwdCorrect = user.comparePwd(input.password);
+
+      if (!isPwdCorrect) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.NOT_FOUND), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.NOT_FOUND),
+            http: {
+              status: StatusCodes.NOT_FOUND,
+            },
+          },
+        });
+      }
+
       await User.findByIdAndDelete(authUser.userId);
       const userExists = await User.exists({ _id: authUser.userId });
 
