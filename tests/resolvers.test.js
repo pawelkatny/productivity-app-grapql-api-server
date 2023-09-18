@@ -5,6 +5,7 @@ const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { jwt } = require("../src/helpers");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 
 let server;
 
@@ -177,6 +178,52 @@ describe("User resolver", () => {
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
         StatusCodes.UNAUTHORIZED
       );
+    });
+  });
+
+  describe("delteUser", () => {
+    it("should successfully delete user and connected tasks", async () => {
+      const { User, Task } = context.db;
+      const user = new User();
+      const password = "password";
+      const authUser = {
+        userId: user._id.toString(),
+      };
+
+      const contextValue = {
+        db: context.db,
+        authUser,
+      };
+
+      const userFindById = jest
+        .spyOn(User, "findById")
+        .mockImplementationOnce(() => user);
+      const userFindByIdAndDelete = jest.spyOn(User, "findByIdAndDelete");
+      const userExists = jest
+        .spyOn(User, "exists")
+        .mockResolvedValueOnce(false);
+      const taskDeleteMany = jest.spyOn(Task, "deleteMany");
+      jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(true);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: DeleteUserInput!) {deleteUser(input: $input)}`,
+          variables: {
+            input: {
+              password,
+            },
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(userFindById).toBeCalledWith(authUser.userId);
+      expect(taskDeleteMany).toBeCalledWith({ user: authUser.userId });
+      expect(userFindByIdAndDelete).toBeCalledWith(authUser.userId);
+      expect(res.body.singleResult.data.deleteUser).toEqual(true);
+      console.log(res.body.singleResult);
     });
   });
 });
