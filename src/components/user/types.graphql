@@ -31,7 +31,8 @@ input ChangeUserPasswordInput {
 type Mutation {
   registerUser(input: RegisterUserInput!): AuthUser!
   loginUser(input: LoginUserInput!): AuthUser!
-  deleteUser(input: DeleteUserInput!): Boolean
+  deleteUser(input: DeleteUserInput!): Boolean!
+  changeUserPassword(input: ChangeUserPasswordInput!): Boolean!
 }
 
 type Query {
