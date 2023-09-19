@@ -23,6 +23,11 @@ input DeleteUserInput {
   password: String!
 }
 
+input ChangeUserPasswordInput {
+  oldPassword: String!
+  newPassword: String!
+}
+
 type Mutation {
   registerUser(input: RegisterUserInput!): AuthUser!
   loginUser(input: LoginUserInput!): AuthUser!
