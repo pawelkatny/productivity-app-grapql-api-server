@@ -91,14 +91,14 @@ module.exports = {
         });
       }
 
-      const isPwdCorrect = user.comparePwd(input.password);
+      const isPwdCorrect = await user.comparePwd(input.password);
 
       if (!isPwdCorrect) {
-        throw new GraphQLError(getReasonPhrase(StatusCodes.NOT_FOUND), {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
           extensions: {
-            code: parseStatusCode(StatusCodes.NOT_FOUND),
+            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
             http: {
-              status: StatusCodes.NOT_FOUND,
+              status: StatusCodes.UNAUTHORIZED,
             },
           },
         });
