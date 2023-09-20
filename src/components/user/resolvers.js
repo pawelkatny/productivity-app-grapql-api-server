@@ -110,5 +110,67 @@ module.exports = {
 
       return !userExists ? true : false;
     },
+    changeUserPassword: async (
+      parent,
+      { input },
+      { authUser, db: { User } },
+      info
+    ) => {
+      if (!authUser) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
+            http: {
+              status: StatusCodes.UNAUTHORIZED,
+            },
+          },
+        });
+      }
+
+      const user = await User.findById(authUser.userId);
+
+      if (!user) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.NOT_FOUND), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.NOT_FOUND),
+            http: {
+              status: StatusCodes.NOT_FOUND,
+            },
+          },
+        });
+      }
+
+      const isOldPwdCorrect = await user.comparePwd(input.oldPassword);
+
+      if (!isOldPwdCorrect) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
+            http: {
+              status: StatusCodes.UNAUTHORIZED,
+            },
+          },
+        });
+      }
+
+      user.password = input.newPassword;
+      const updatedUser = await user.save();
+
+      if (!updatedUser) {
+        throw new GraphQLError(
+          getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+          {
+            extensions: {
+              code: parseStatusCode(StatusCodes.INTERNAL_SERVER_ERROR),
+              http: {
+                status: StatusCodes.INTERNAL_SERVER_ERROR,
+              },
+            },
+          }
+        );
+      }
+
+      return true;
+    },
   },
 };
