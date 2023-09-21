@@ -348,5 +348,36 @@ describe("User resolver", () => {
       expect(res.body.singleResult.data.changeUserPassword).toEqual(true);
       expect(res.body.singleResult.errors).toBeFalsy();
     });
+    it("should throw error if request is missing authUser object", async () => {
+      const input = {
+        oldPassword: mockUserInputData.password,
+        newPassword: mockUserInputData.password + "!",
+      };
+
+      const contextValue = {
+        db: context.db,
+        authUser: null,
+      };
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: ChangeUserPasswordInput!) {changeUserPassword(input: $input)}`,
+          variables: {
+            input,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "UNAUTHORIZED"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        401
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
   });
 });
