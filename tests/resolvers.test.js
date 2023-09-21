@@ -414,5 +414,42 @@ describe("User resolver", () => {
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
+    it("should throw error if user is not found", async () => {
+      const { User, Task } = context.db;
+      const user = new User();
+      const input = {
+        oldPassword: mockUserInputData.password,
+        newPassword: mockUserInputData.password + "!",
+      };
+
+      const contextValue = {
+        db: context.db,
+        authUser: true,
+      };
+
+      jest.spyOn(User, "findById").mockImplementationOnce(() => user);
+
+      jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(false);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: ChangeUserPasswordInput!) {changeUserPassword(input: $input)}`,
+          variables: {
+            input,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "UNAUTHORIZED"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        401
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
   });
 });
