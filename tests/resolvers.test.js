@@ -261,7 +261,7 @@ describe("User resolver", () => {
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
         404
       );
-      expect(res.body.singleResult.data.deleteUser).toEqual(null);
+      expect(res.body.singleResult.data).toEqual(null);
     });
     it("should return error when password doesnt match", async () => {
       const { User, Task } = context.db;
@@ -302,7 +302,51 @@ describe("User resolver", () => {
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
         401
       );
-      expect(res.body.singleResult.data.deleteUser).toEqual(null);
+      expect(res.body.singleResult.data).toEqual(null);
+    });
+  });
+  describe("changeUserPassword", () => {
+    it("should successfully change user password", async () => {
+      const { User, Task } = context.db;
+      const user = new User({
+        ...mockUserInputData,
+        email: mockUserInputData.email + "n",
+      });
+      const input = {
+        oldPassword: mockUserInputData.password,
+        newPassword: mockUserInputData.password + "!",
+      };
+      const authUser = {
+        userId: user._id.toString(),
+      };
+
+      const contextValue = {
+        db: context.db,
+        authUser,
+      };
+
+      const userFindById = jest
+        .spyOn(User, "findById")
+        .mockImplementationOnce(() => user);
+
+      jest.spyOn(user, "save").mockImplementationOnce(() => true);
+      jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(true);
+      jest.spyOn(bcrypt, "hash").mockResolvedValueOnce("hashedPassword");
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: ChangeUserPasswordInput!) {changeUserPassword(input: $input)}`,
+          variables: {
+            input,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.data.changeUserPassword).toEqual(true);
+      expect(res.body.singleResult.errors).toBeFalsy();
     });
   });
 });
