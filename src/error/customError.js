@@ -2,7 +2,7 @@ const { GraphQLError } = require("graphql");
 const { getReasonPhrase } = require("http-status-codes");
 const { parseStatusCode } = require("../../helpers");
 
-export class CustomGraphQLerror extends GraphQLError {
+module.exports = class CustomGraphQLerror extends GraphQLError {
   constructor(statusCode) {
     const message = getReasonPhrase(statusCode);
     const extensions = {
@@ -14,4 +14,4 @@ export class CustomGraphQLerror extends GraphQLError {
 
     super(message, { extensions });
   }
-}
+};
