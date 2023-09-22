@@ -9,8 +9,7 @@ type UserSettings {
   taskRequestLimit: Int!
 }
 
-type AuthUser {
-  name: String!
+type UserToken {
   token: Token!
 }
 
@@ -41,8 +40,8 @@ input ChangeUserPasswordInput {
 }
 
 type Mutation {
-  registerUser(input: RegisterUserInput!): AuthUser!
-  loginUser(input: LoginUserInput!): AuthUser!
+  registerUser(input: RegisterUserInput!): UserToken!
+  loginUser(input: LoginUserInput!): UserToken!
   deleteUser(input: DeleteUserInput!): Boolean!
   changeUserPassword(input: ChangeUserPasswordInput!): Boolean!
 }
