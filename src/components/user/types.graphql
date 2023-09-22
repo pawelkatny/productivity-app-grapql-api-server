@@ -14,8 +14,14 @@ input RegisterUserInput {
   password: String!
 }
 
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
 type Mutation {
   registerUser(input: RegisterUserInput!): AuthUser!
+  loginUser(input: LoginUserInput!): AuthUser!
 }
 
 type Query {

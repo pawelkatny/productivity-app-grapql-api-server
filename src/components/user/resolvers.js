@@ -1,6 +1,6 @@
 const { JWT_EXPIRATION, JWT_TYPE } = require("../../config");
 const { parseStatusCode } = require("../../helpers");
-const { StatusCodes } = require("http-status-codes");
+const { StatusCodes, getReasonPhrase } = require("http-status-codes");
 const { GraphQLError } = require("graphql");
 
 module.exports = {
@@ -25,16 +25,45 @@ module.exports = {
       }
 
       user = await User.create({ ...input });
-      const accessToken = await user.createAuthToken();
+      const token = await user.createAuthToken();
 
-      return {
-        name: user.name,
-        token: {
-          accessToken,
-          expiresIn: JWT_EXPIRATION,
-          type: JWT_TYPE,
-        },
-      };
+      return token;
+    },
+    loginUser: async (
+      parent,
+      { input: { email, password } },
+      { db: { User } },
+      info
+    ) => {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
+            http: {
+              status: StatusCodes.UNAUTHORIZED,
+            },
+          },
+        });
+      }
+
+      const isPwdCorrect = await user.comparePwd(password);
+
+      if (!isPwdCorrect) {
+        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
+          extensions: {
+            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
+            http: {
+              status: StatusCodes.UNAUTHORIZED,
+            },
+          },
+        });
+      }
+
+      const token = await user.createAuthToken();
+
+      return token;
     },
   },
 };

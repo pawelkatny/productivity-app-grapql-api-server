@@ -54,13 +54,13 @@ describe("User model", () => {
   it("should fetch user and create auth token", async () => {
     const sign = jest.spyOn(jwt, "sign").mockResolvedValueOnce("jwt_token");
     const user = await User.findOne();
-    const token = await user.createAuthToken();
+    const tokenObj = await user.createAuthToken();
 
     expect(user).toBeTruthy();
     expect(sign).toBeCalledWith({ userId: user._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRATION,
     });
-    expect(token).toBe("jwt_token");
+    expect(tokenObj.token.accessToken).toBe("jwt_token");
   });
 
   it("should throw duplicate key error when creating user with already used email", async () => {
