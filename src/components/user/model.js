@@ -57,6 +57,8 @@ const userSchema = mongoose.Schema(
       },
     },
 
+    lastLoginDate: Date,
+
     expireAt: {
       type: Date,
       default: new Date(new Date().valueOf() + 604800000),
