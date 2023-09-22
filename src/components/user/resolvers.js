@@ -57,7 +57,7 @@ module.exports = {
       const isPwdCorrect = await user.comparePwd(input.password);
 
       if (!isPwdCorrect) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZE);
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
       await Task.deleteMany({ user: authUser.userId });

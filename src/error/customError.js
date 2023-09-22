@@ -1,6 +1,6 @@
 const { GraphQLError } = require("graphql");
 const { getReasonPhrase } = require("http-status-codes");
-const { parseStatusCode } = require("../../helpers");
+const { parseStatusCode } = require("../helpers");
 
 module.exports = class CustomGraphQLerror extends GraphQLError {
   constructor(statusCode) {
