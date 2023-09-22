@@ -89,7 +89,6 @@ userSchema.methods.createAuthToken = async function () {
   });
 
   return {
-    name: this.name,
     token: {
       accessToken: token,
       expiresIn: JWT_EXPIRATION,
