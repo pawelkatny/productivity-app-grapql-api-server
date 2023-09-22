@@ -3,9 +3,21 @@ type Token {
   expiresIn: String!
   type: String!
 }
+
+type UserSettings {
+  defaultView: String!
+  taskRequestLimit: Int!
+}
+
 type AuthUser {
   name: String!
   token: Token!
+}
+
+type User {
+  name: String!
+  settings: UserSettings!
+  lastLoginDate: String!
 }
 
 input RegisterUserInput {
