@@ -18,7 +18,7 @@ module.exports = {
       return {
         name: user.name,
         settings: user.settings,
-        lastLoginDate: user.lastLoginDate,
+        lastLoginDate: user.lastLoginDate.toISOString(),
       };
     },
   },
