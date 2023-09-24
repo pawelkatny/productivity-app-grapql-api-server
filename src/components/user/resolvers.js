@@ -32,6 +32,7 @@ module.exports = {
 
       user = await User.create({ ...input });
       await user.updateLastLoginDate();
+      await user.save();
       const token = await user.createAuthToken();
 
       return token;
@@ -55,6 +56,7 @@ module.exports = {
       }
 
       await user.updateLastLoginDate();
+      await user.save();
       const token = await user.createAuthToken();
 
       return token;
