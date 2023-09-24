@@ -54,6 +54,7 @@ module.exports = {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
+      await user.updateLastLoginDate();
       const token = await user.createAuthToken();
 
       return token;
