@@ -42,7 +42,6 @@ input ChangeUserPasswordInput {
 input UpdateUserInput {
   name: String!
   settings: UserSettings!
-  lastLoginDate: String!
 }
 
 type Mutation {
