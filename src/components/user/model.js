@@ -54,6 +54,8 @@ const userSchema = mongoose.Schema(
       taskRequestLimit: {
         type: Number,
         default: 20,
+        min: 10,
+        max: 100,
       },
     },
 
