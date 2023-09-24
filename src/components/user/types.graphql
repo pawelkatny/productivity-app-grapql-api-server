@@ -39,9 +39,14 @@ input ChangeUserPasswordInput {
   newPassword: String!
 }
 
+input UserSettingInput {
+  defaultView: String!
+  taskRequestLimit: Int!
+}
+
 input UpdateUserInput {
   name: String!
-  settings: UserSettings!
+  settings: UserSettingInput!
 }
 
 type Mutation {

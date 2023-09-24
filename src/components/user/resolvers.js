@@ -117,7 +117,7 @@ module.exports = {
     },
     updateUser: async (
       parent,
-      { name, settings },
+      { input: { name, settings } },
       { authUser, db: { User } },
       info
     ) => {
