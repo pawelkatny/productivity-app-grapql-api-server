@@ -115,5 +115,31 @@ module.exports = {
 
       return true;
     },
+    updateUser: async (
+      parent,
+      { name, settings },
+      { authUser, db: { User } },
+      info
+    ) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+
+      const user = await User.findById(authUser.userId);
+
+      if (!user) {
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
+      }
+
+      user.name = name;
+      user.settings = settings;
+      const updatedUser = await user.save();
+
+      return {
+        name: updatedUser.name,
+        settings: updatedUser.settings,
+        lastLoginDate: updatedUser.lastLoginDate,
+      };
+    },
   },
 };
