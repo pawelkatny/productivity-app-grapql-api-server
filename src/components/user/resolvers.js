@@ -4,8 +4,22 @@ const Task = require("../task/model");
 
 module.exports = {
   Query: {
-    user: async (parent, args, context, info) => {
-      return "user query";
+    getUser: async (parent, args, { authUser, db: { User } }, info) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+
+      const user = await User.findById(authUser.userId);
+
+      if (!user) {
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
+      }
+
+      return {
+        name: user.name,
+        settings: user.settings,
+        lastLoginDate: user.lastLoginDate,
+      };
     },
   },
   Mutation: {

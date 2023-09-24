@@ -97,6 +97,10 @@ userSchema.methods.createAuthToken = async function () {
   };
 };
 
+userSchema.methods.updateLastLoginDate = async function () {
+  this.lastLoginDate = new Date();
+};
+
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

@@ -47,5 +47,5 @@ type Mutation {
 }
 
 type Query {
-  user: String
+  getUser: User!
 }
