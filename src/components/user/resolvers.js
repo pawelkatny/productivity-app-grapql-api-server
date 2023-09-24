@@ -138,7 +138,7 @@ module.exports = {
       return {
         name: updatedUser.name,
         settings: updatedUser.settings,
-        lastLoginDate: updatedUser.lastLoginDate,
+        lastLoginDate: updatedUser.lastLoginDate.toISOString(),
       };
     },
   },
