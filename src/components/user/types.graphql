@@ -39,11 +39,18 @@ input ChangeUserPasswordInput {
   newPassword: String!
 }
 
+input UpdateUserInput {
+  name: String!
+  settings: UserSettings!
+  lastLoginDate: String!
+}
+
 type Mutation {
   registerUser(input: RegisterUserInput!): UserToken!
   loginUser(input: LoginUserInput!): UserToken!
   deleteUser(input: DeleteUserInput!): Boolean!
   changeUserPassword(input: ChangeUserPasswordInput!): Boolean!
+  updateUser(input: UpdateUserInput!): User!
 }
 
 type Query {
