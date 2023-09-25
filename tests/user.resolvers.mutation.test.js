@@ -455,4 +455,53 @@ describe("User resolver", () => {
       expect(res.body.singleResult.data).toEqual(null);
     });
   });
+  describe("updateUser", () => {
+    it("should successfully update user document", async () => {
+      const { User, Task } = context.db;
+      const user = new User(mockUserInputData);
+
+      const contextValue = {
+        db: context.db,
+        authUser: true,
+      };
+
+      const mockUserUpdateData = {
+        name: "John",
+        settings: {
+          defaultView: "year",
+          taskRequestLimit: 100,
+        },
+      };
+
+      const lastLoginDate = new Date();
+
+      jest.spyOn(User, "findById").mockImplementationOnce(() => user);
+
+      jest.spyOn(user, "save").mockImplementationOnce(() => {
+        user.name = mockUserUpdateData.name;
+        user.settings = mockUserUpdateData.settings;
+        user.lastLoginDate = lastLoginDate;
+        return user;
+      });
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateUserInput!) {updateUser(input: $input) { name settings {defaultView taskRequestLimit} lastLoginDate }}`,
+          variables: {
+            input: mockUserUpdateData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.data).toBeTruthy();
+      expect(res.body.singleResult.data.updateUser).toEqual({
+        ...mockUserUpdateData,
+        lastLoginDate: lastLoginDate.toISOString(),
+      });
+      expect(res.body.singleResult.errors).toBeUndefined();
+    });
+  });
 });
