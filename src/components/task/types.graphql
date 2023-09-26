@@ -18,6 +18,10 @@ input CreateTaskInput {
   priority: Int
 }
 
+type Mutation {
+  createTask(input: CreateTaskInput!): Task!
+}
+
 type Query {
   task: String
 }
