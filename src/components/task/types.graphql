@@ -1,3 +1,15 @@
+type Task {
+  name: String!
+  type: String!
+  date: String!
+  isCompleted: Boolean!
+  completionDate: String
+  notes: String
+  priority: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
 type Query {
   task: String
 }
