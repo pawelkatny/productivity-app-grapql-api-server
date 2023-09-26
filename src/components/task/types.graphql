@@ -10,6 +10,14 @@ type Task {
   updatedAt: String!
 }
 
+input CreateTaskInput {
+  name: String!
+  type: String!
+  notes: String
+  date: String
+  priority: Int
+}
+
 type Query {
   task: String
 }
