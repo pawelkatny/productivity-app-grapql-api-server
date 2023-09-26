@@ -262,7 +262,7 @@ describe("User resolver", () => {
         "NOT FOUND"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        404
+        StatusCodes.NOT_FOUND
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -303,7 +303,7 @@ describe("User resolver", () => {
         "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        401
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -378,7 +378,7 @@ describe("User resolver", () => {
         "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        401
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -413,7 +413,7 @@ describe("User resolver", () => {
         "NOT FOUND"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        404
+        StatusCodes.NOT_FOUND
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -450,7 +450,7 @@ describe("User resolver", () => {
         "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        401
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -534,7 +534,7 @@ describe("User resolver", () => {
         "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        401
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -571,7 +571,7 @@ describe("User resolver", () => {
         "NOT FOUND"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        404
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
