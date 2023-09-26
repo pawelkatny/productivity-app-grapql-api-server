@@ -503,5 +503,77 @@ describe("User resolver", () => {
       });
       expect(res.body.singleResult.errors).toBeUndefined();
     });
+    it("should throw error is user is not auth", async () => {
+      const { User } = context.db;
+      const contextValue = {
+        db: context.db,
+        authUser: false,
+      };
+
+      const mockUserUpdateData = {
+        name: "John",
+        settings: {
+          defaultView: "year",
+          taskRequestLimit: 100,
+        },
+      };
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateUserInput!) {updateUser(input: $input) { name settings {defaultView taskRequestLimit} lastLoginDate }}`,
+          variables: {
+            input: mockUserUpdateData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "UNAUTHORIZED"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        401
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
+    it("should throw error if user not found", async () => {
+      const { User } = context.db;
+      const contextValue = {
+        db: context.db,
+        authUser: true,
+      };
+
+      const mockUserUpdateData = {
+        name: "John",
+        settings: {
+          defaultView: "year",
+          taskRequestLimit: 100,
+        },
+      };
+
+      jest.spyOn(User, "findById").mockImplementationOnce(() => null);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateUserInput!) {updateUser(input: $input) { name settings {defaultView taskRequestLimit} lastLoginDate }}`,
+          variables: {
+            input: mockUserUpdateData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "NOT FOUND"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        404
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
   });
 });
