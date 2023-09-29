@@ -1,4 +1,5 @@
 type Task {
+  id: ID!
   name: String!
   type: String!
   date: String!
