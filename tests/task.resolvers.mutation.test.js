@@ -90,5 +90,40 @@ describe("Task resolver mutations", () => {
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
+    it("should throw error when task was not created", async () => {
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
+      const task = new Task(mockTaskData);
+
+      const contextValue = {
+        db: context.db,
+        authUser: {
+          isAuth: true,
+          userId: user._id.toString(),
+        },
+      };
+
+      jest.spyOn(Task, "create").mockImplementationOnce(() => null);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: CreateTaskInput!) { createTask(input: $input) { id name type }}`,
+          variables: {
+            input: mockTaskData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "INTERNAL SERVER ERROR"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
   });
 });
