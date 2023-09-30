@@ -3,17 +3,11 @@ const CustomGraphQLerror = require("../../error/customError");
 
 module.exports = {
   Query: {
-    getTask: async (
-      parent,
-      { input: taskId },
-      { authUser, db: { Task } },
-      info
-    ) => {
+    getTask: async (parent, { id }, { authUser, db: { Task } }, info) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
-
-      const task = await Task.findById(taskId);
+      const task = await Task.findById(id);
 
       if (!task) {
         throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
