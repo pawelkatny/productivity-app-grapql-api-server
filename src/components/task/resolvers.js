@@ -17,7 +17,7 @@ module.exports = {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
-      const task = await Task.findById(id);
+      const task = await Task.findOne({ _id: id, user: authUser.userId });
 
       if (!task) {
         throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
