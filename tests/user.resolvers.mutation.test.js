@@ -571,7 +571,7 @@ describe("User resolver", () => {
         "NOT FOUND"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        StatusCodes.UNAUTHORIZED
+        StatusCodes.NOT_FOUND
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
