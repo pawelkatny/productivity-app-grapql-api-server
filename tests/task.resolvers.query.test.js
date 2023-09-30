@@ -1,0 +1,132 @@
+const apolloServer = require("../src/helpers/mockApolloServer");
+const context = require("../src/context");
+const { StatusCodes, getReasonPhrase } = require("http-status-codes");
+
+let server;
+
+beforeAll(async () => {
+  server = apolloServer.create();
+});
+
+afterAll(async () => {
+  server.stop();
+});
+
+const mockUserData = {
+  email: "test@email.com",
+  name: "Johny",
+  password: "paS$w0rd",
+  lastLoginDate: new Date(),
+};
+
+const mockTaskData = {
+  name: "Test task",
+  type: "day",
+  notes: "Test description",
+};
+
+describe("Task resolver queries", () => {
+  describe("getTask", () => {
+    it("should successfully retrieve task", async () => {
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
+      const task = new Task(mockTaskData);
+
+      const contextValue = {
+        db: context.db,
+        authUser: {
+          isAuth: true,
+          userId: user._id.toString(),
+        },
+      };
+
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => {
+        task._doc.createdAt = new Date();
+        task._doc.updatedAt = new Date();
+        return task;
+      });
+
+      const res = await server.executeOperation(
+        {
+          query: `query Query($getTaskId: ID!) { getTask(id: $getTaskId) { id name type }}`,
+          variables: {
+            getTaskId: task._id.toString(),
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.data.getTask).toEqual({
+        id: task._id.toString(),
+        name: task.name,
+        type: task.type,
+      });
+      expect(res.body.singleResult.errors).toBeUndefined();
+    });
+    it("should throw error is user is not auth", async () => {
+      const { Task } = context.db;
+      const task = new Task(mockTaskData);
+      const contextValue = {
+        db: context.db,
+        authUser: false,
+      };
+
+      const res = await server.executeOperation(
+        {
+          query: `query Query($getTaskId: ID!) { getTask(id: $getTaskId) { id name type }}`,
+          variables: {
+            getTaskId: task._id.toString(),
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "UNAUTHORIZED"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        StatusCodes.UNAUTHORIZED
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
+    it("should throw error if task is not found", async () => {
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
+      const task = new Task(mockTaskData);
+
+      const contextValue = {
+        db: context.db,
+        authUser: {
+          isAuth: true,
+          userId: user._id.toString(),
+        },
+      };
+
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => null);
+
+      const res = await server.executeOperation(
+        {
+          query: `query Query($getTaskId: ID!) { getTask(id: $getTaskId) { id name type }}`,
+          variables: {
+            getTaskId: task._id.toString(),
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].message).toEqual(
+        getReasonPhrase(StatusCodes.NOT_FOUND)
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        StatusCodes.NOT_FOUND
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
+  });
+});
