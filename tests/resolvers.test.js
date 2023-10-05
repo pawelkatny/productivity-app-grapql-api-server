@@ -5,6 +5,7 @@ const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { jwt } = require("../src/helpers");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 
 let server;
 
@@ -76,21 +77,21 @@ describe("User resolver", () => {
         }
       );
 
+      const expectErrObj = expect.objectContaining({
+        errorsPretty: [
+          {
+            message:
+              "Password should contain at least: one uppercase character, one lowercase character, one digit and one special character (@$!%*?&).",
+            path: "password",
+          },
+        ],
+      });
+
+      const expectErrArr = expect.arrayContaining([expectErrObj]);
+
       expect(res.body.singleResult.data).toBeNull();
       expect(res.body.singleResult.errors).toBeDefined();
-      expect(res.body.singleResult.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            errorsPretty: [
-              {
-                message:
-                  "Password should contain at least: one uppercase character, one lowercase character, one digit and one special character (@$!%*?&).",
-                path: "password",
-              },
-            ],
-          }),
-        ])
-      );
+      expect(res.body.singleResult.errors).toEqual(expectErrArr);
       expect(res.body.singleResult.errors[0].extensions.code).toEqual(
         ApolloServerErrorCode.BAD_REQUEST
       );
@@ -177,6 +178,131 @@ describe("User resolver", () => {
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
         StatusCodes.UNAUTHORIZED
       );
+    });
+  });
+
+  describe("delteUser", () => {
+    it("should successfully delete user and connected tasks", async () => {
+      const { User, Task } = context.db;
+      const user = new User();
+      const password = "password";
+      const authUser = {
+        userId: user._id.toString(),
+      };
+
+      const contextValue = {
+        db: context.db,
+        authUser,
+      };
+
+      const userFindById = jest
+        .spyOn(User, "findById")
+        .mockImplementationOnce(() => user);
+      const userFindByIdAndDelete = jest.spyOn(User, "findByIdAndDelete");
+      const userExists = jest
+        .spyOn(User, "exists")
+        .mockResolvedValueOnce(false);
+      const taskDeleteMany = jest.spyOn(Task, "deleteMany");
+      jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(true);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: DeleteUserInput!) {deleteUser(input: $input)}`,
+          variables: {
+            input: {
+              password,
+            },
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(userFindById).toBeCalledWith(authUser.userId);
+      expect(taskDeleteMany).toBeCalledWith({ user: authUser.userId });
+      expect(userFindByIdAndDelete).toBeCalledWith(authUser.userId);
+      expect(res.body.singleResult.data.deleteUser).toEqual(true);
+    });
+    it("should return error when user not found", async () => {
+      const { User, Task } = context.db;
+      const user = new User();
+      const password = "password";
+      const authUser = {
+        userId: user._id.toString(),
+      };
+
+      const contextValue = {
+        db: context.db,
+        authUser,
+      };
+
+      const userFindById = jest
+        .spyOn(User, "findById")
+        .mockImplementationOnce(() => null);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: DeleteUserInput!) {deleteUser(input: $input)}`,
+          variables: {
+            input: {
+              password,
+            },
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "NOT FOUND"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        404
+      );
+      expect(res.body.singleResult.data.deleteUser).toEqual(null);
+    });
+    it("should return error when password doesnt match", async () => {
+      const { User, Task } = context.db;
+      const user = new User();
+      const password = "password";
+      const authUser = {
+        userId: user._id.toString(),
+      };
+
+      const contextValue = {
+        db: context.db,
+        authUser,
+      };
+
+      const userFindById = jest
+        .spyOn(User, "findById")
+        .mockImplementationOnce(() => user);
+
+      jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(false);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: DeleteUserInput!) {deleteUser(input: $input)}`,
+          variables: {
+            input: {
+              password,
+            },
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "UNAUTHORIZED"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        401
+      );
+      expect(res.body.singleResult.data.deleteUser).toEqual(null);
     });
   });
 });
