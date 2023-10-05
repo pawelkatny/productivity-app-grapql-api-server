@@ -45,17 +45,6 @@ const userSchema = mongoose.Schema(
       maxlength: [72, "Password must be at max 72 characters long."],
     },
 
-    passwordReset: {
-      token: {
-        type: String,
-        default: null,
-        maxlength: 24,
-      },
-      expireAt: {
-        type: Date,
-      },
-    },
-
     expireAt: {
       type: Date,
       default: new Date(new Date().valueOf() + 604800000),

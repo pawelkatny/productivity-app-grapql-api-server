@@ -1,7 +1,5 @@
-const { JWT_EXPIRATION, JWT_TYPE } = require("../../config");
-const { parseStatusCode } = require("../../helpers");
-const { StatusCodes, getReasonPhrase } = require("http-status-codes");
-const { GraphQLError } = require("graphql");
+const { StatusCodes } = require("http-status-codes");
+const CustomGraphQLerror = require("../../error/customError");
 const Task = require("../task/model");
 
 module.exports = {
@@ -15,14 +13,7 @@ module.exports = {
       let user = await User.findOne({ email: input.email });
 
       if (user) {
-        throw new GraphQLError("Email address already in use.", {
-          extensions: {
-            code: parseStatusCode(StatusCodes.CONFLICT),
-            http: {
-              status: StatusCodes.CONFLICT,
-            },
-          },
-        });
+        throw new CustomGraphQLerror(StatusCodes.CONFLICT);
       }
 
       user = await User.create({ ...input });
@@ -39,27 +30,13 @@ module.exports = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
-          extensions: {
-            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
-            http: {
-              status: StatusCodes.UNAUTHORIZED,
-            },
-          },
-        });
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
       const isPwdCorrect = await user.comparePwd(password);
 
       if (!isPwdCorrect) {
-        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
-          extensions: {
-            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
-            http: {
-              status: StatusCodes.UNAUTHORIZED,
-            },
-          },
-        });
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
       const token = await user.createAuthToken();
@@ -68,40 +45,19 @@ module.exports = {
     },
     deleteUser: async (parent, { input }, { authUser, db: { User } }, info) => {
       if (!authUser) {
-        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
-          extensions: {
-            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
-            http: {
-              status: StatusCodes.UNAUTHORIZED,
-            },
-          },
-        });
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
       const user = await User.findById(authUser.userId);
 
       if (!user) {
-        throw new GraphQLError(getReasonPhrase(StatusCodes.NOT_FOUND), {
-          extensions: {
-            code: parseStatusCode(StatusCodes.NOT_FOUND),
-            http: {
-              status: StatusCodes.NOT_FOUND,
-            },
-          },
-        });
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
       }
 
       const isPwdCorrect = await user.comparePwd(input.password);
 
       if (!isPwdCorrect) {
-        throw new GraphQLError(getReasonPhrase(StatusCodes.UNAUTHORIZED), {
-          extensions: {
-            code: parseStatusCode(StatusCodes.UNAUTHORIZED),
-            http: {
-              status: StatusCodes.UNAUTHORIZED,
-            },
-          },
-        });
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
       await Task.deleteMany({ user: authUser.userId });
@@ -109,6 +65,37 @@ module.exports = {
       const userExists = await User.exists({ _id: authUser.userId });
 
       return !userExists ? true : false;
+    },
+    changeUserPassword: async (
+      parent,
+      { input },
+      { authUser, db: { User } },
+      info
+    ) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+
+      const user = await User.findById(authUser.userId);
+
+      if (!user) {
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
+      }
+
+      const isOldPwdCorrect = await user.comparePwd(input.oldPassword);
+
+      if (!isOldPwdCorrect) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+
+      user.password = input.newPassword;
+      const updatedUser = await user.save();
+
+      if (!updatedUser) {
+        throw new CustomGraphQLerror(StatusCodes.INTERNAL_SERVER_ERROR);
+      }
+
+      return true;
     },
   },
 };

@@ -23,10 +23,16 @@ input DeleteUserInput {
   password: String!
 }
 
+input ChangeUserPasswordInput {
+  oldPassword: String!
+  newPassword: String!
+}
+
 type Mutation {
   registerUser(input: RegisterUserInput!): AuthUser!
   loginUser(input: LoginUserInput!): AuthUser!
-  deleteUser(input: DeleteUserInput!): Boolean
+  deleteUser(input: DeleteUserInput!): Boolean!
+  changeUserPassword(input: ChangeUserPasswordInput!): Boolean!
 }
 
 type Query {
