@@ -40,13 +40,22 @@ const mockUserInputIncorrectData = {
   password: "password",
 };
 
+const mockUserUpdateData = {
+  name: "John",
+  settings: {
+    defaultView: "year",
+    taskRequestLimit: 100,
+  },
+};
+
 describe("User resolver", () => {
   describe("registerUser", () => {
     it("should register user and return auth token data", async () => {
+      jest.spyOn(jwt, "sign").mockResolvedValueOnce("accessToken");
       const res = await server.executeOperation(
         {
           query:
-            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) {name}}",
+            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) {token { accessToken }}}",
           variables: {
             input: mockUserInputData,
           },
@@ -59,7 +68,9 @@ describe("User resolver", () => {
       expect(res.body.singleResult.errors).toBeUndefined();
       expect(res.body.singleResult.data).toBeDefined();
       expect(res.body.singleResult.data.registerUser).toEqual({
-        name: mockUserInputData.name,
+        token: {
+          accessToken: "accessToken",
+        },
       });
     });
 
@@ -67,7 +78,7 @@ describe("User resolver", () => {
       const res = await server.executeOperation(
         {
           query:
-            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) {name}}",
+            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) {token { accessToken }}}",
           variables: {
             input: mockUserInputIncorrectData,
           },
@@ -131,7 +142,7 @@ describe("User resolver", () => {
       };
       const res = await server.executeOperation(
         {
-          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { name }}`,
+          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { token { accessToken } }}`,
           variables: {
             input: loginUserInput,
           },
@@ -160,7 +171,7 @@ describe("User resolver", () => {
       };
       const res = await server.executeOperation(
         {
-          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { name }}`,
+          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { token { accessToken } }}`,
           variables: {
             input: loginUserInput,
           },
@@ -259,7 +270,7 @@ describe("User resolver", () => {
         "NOT FOUND"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        404
+        StatusCodes.NOT_FOUND
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -300,7 +311,7 @@ describe("User resolver", () => {
         "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        401
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -375,7 +386,7 @@ describe("User resolver", () => {
         "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        401
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -410,7 +421,7 @@ describe("User resolver", () => {
         "NOT FOUND"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        404
+        StatusCodes.NOT_FOUND
       );
       expect(res.body.singleResult.data).toEqual(null);
     });
@@ -447,7 +458,104 @@ describe("User resolver", () => {
         "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        401
+        StatusCodes.UNAUTHORIZED
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
+  });
+  describe("updateUser", () => {
+    it("should successfully update user document", async () => {
+      const { User, Task } = context.db;
+      const user = new User(mockUserInputData);
+
+      const contextValue = {
+        db: context.db,
+        authUser: true,
+      };
+
+      const lastLoginDate = new Date();
+
+      jest.spyOn(User, "findById").mockImplementationOnce(() => user);
+
+      jest.spyOn(user, "save").mockImplementationOnce(() => {
+        user.name = mockUserUpdateData.name;
+        user.settings = mockUserUpdateData.settings;
+        user.lastLoginDate = lastLoginDate;
+        return user;
+      });
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateUserInput!) {updateUser(input: $input) { name settings {defaultView taskRequestLimit} lastLoginDate }}`,
+          variables: {
+            input: mockUserUpdateData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.data).toBeTruthy();
+      expect(res.body.singleResult.data.updateUser).toEqual({
+        ...mockUserUpdateData,
+        lastLoginDate: lastLoginDate.toISOString(),
+      });
+      expect(res.body.singleResult.errors).toBeUndefined();
+    });
+    it("should throw error is user is not auth", async () => {
+      const { User } = context.db;
+      const contextValue = {
+        db: context.db,
+        authUser: false,
+      };
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateUserInput!) {updateUser(input: $input) { name settings {defaultView taskRequestLimit} lastLoginDate }}`,
+          variables: {
+            input: mockUserUpdateData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "UNAUTHORIZED"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        StatusCodes.UNAUTHORIZED
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
+    it("should throw error if user not found", async () => {
+      const { User } = context.db;
+      const contextValue = {
+        db: context.db,
+        authUser: true,
+      };
+
+      jest.spyOn(User, "findById").mockImplementationOnce(() => null);
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateUserInput!) {updateUser(input: $input) { name settings {defaultView taskRequestLimit} lastLoginDate }}`,
+          variables: {
+            input: mockUserUpdateData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "NOT FOUND"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        StatusCodes.NOT_FOUND
       );
       expect(res.body.singleResult.data).toEqual(null);
     });

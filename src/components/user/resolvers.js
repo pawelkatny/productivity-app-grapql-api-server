@@ -4,8 +4,24 @@ const Task = require("../task/model");
 
 module.exports = {
   Query: {
-    user: async (parent, args, context, info) => {
-      return "user query";
+    getUser: async (parent, args, { authUser, db: { User } }, info) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+
+      const user = await User.findById(authUser.userId);
+
+      if (!user) {
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
+      }
+
+      const { name, settings, lastLoginDate } = user;
+
+      return {
+        name,
+        settings,
+        lastLoginDate: lastLoginDate.toISOString(),
+      };
     },
   },
   Mutation: {
@@ -17,6 +33,8 @@ module.exports = {
       }
 
       user = await User.create({ ...input });
+      await user.updateLastLoginDate();
+      await user.save();
       const token = await user.createAuthToken();
 
       return token;
@@ -39,6 +57,8 @@ module.exports = {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
+      await user.updateLastLoginDate();
+      await user.save();
       const token = await user.createAuthToken();
 
       return token;
@@ -96,6 +116,32 @@ module.exports = {
       }
 
       return true;
+    },
+    updateUser: async (
+      parent,
+      { input: { name, settings } },
+      { authUser, db: { User } },
+      info
+    ) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+
+      const user = await User.findById(authUser.userId);
+
+      if (!user) {
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
+      }
+
+      user.name = name;
+      user.settings = settings;
+      const updatedUser = await user.save();
+
+      return {
+        name: updatedUser.name,
+        settings: updatedUser.settings,
+        lastLoginDate: updatedUser.lastLoginDate.toISOString(),
+      };
     },
   },
 };

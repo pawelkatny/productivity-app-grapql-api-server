@@ -45,6 +45,22 @@ const userSchema = mongoose.Schema(
       maxlength: [72, "Password must be at max 72 characters long."],
     },
 
+    settings: {
+      defaultView: {
+        type: String,
+        enum: ["day", "year"],
+        default: "day",
+      },
+      taskRequestLimit: {
+        type: Number,
+        default: 20,
+        min: 10,
+        max: 100,
+      },
+    },
+
+    lastLoginDate: Date,
+
     expireAt: {
       type: Date,
       default: new Date(new Date().valueOf() + 604800000),
@@ -75,13 +91,16 @@ userSchema.methods.createAuthToken = async function () {
   });
 
   return {
-    name: this.name,
     token: {
       accessToken: token,
       expiresIn: JWT_EXPIRATION,
       type: JWT_TYPE,
     },
   };
+};
+
+userSchema.methods.updateLastLoginDate = async function () {
+  this.lastLoginDate = new Date();
 };
 
 const User = mongoose.model("User", userSchema);

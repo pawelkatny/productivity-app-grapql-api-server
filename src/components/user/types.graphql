@@ -3,9 +3,20 @@ type Token {
   expiresIn: String!
   type: String!
 }
-type AuthUser {
-  name: String!
+
+type UserSettings {
+  defaultView: String!
+  taskRequestLimit: Int!
+}
+
+type UserToken {
   token: Token!
+}
+
+type User {
+  name: String!
+  settings: UserSettings!
+  lastLoginDate: String!
 }
 
 input RegisterUserInput {
@@ -28,13 +39,24 @@ input ChangeUserPasswordInput {
   newPassword: String!
 }
 
+input UserSettingInput {
+  defaultView: String!
+  taskRequestLimit: Int!
+}
+
+input UpdateUserInput {
+  name: String!
+  settings: UserSettingInput!
+}
+
 type Mutation {
-  registerUser(input: RegisterUserInput!): AuthUser!
-  loginUser(input: LoginUserInput!): AuthUser!
+  registerUser(input: RegisterUserInput!): UserToken!
+  loginUser(input: LoginUserInput!): UserToken!
   deleteUser(input: DeleteUserInput!): Boolean!
   changeUserPassword(input: ChangeUserPasswordInput!): Boolean!
+  updateUser(input: UpdateUserInput!): User!
 }
 
 type Query {
-  user: String
+  getUser: User!
 }
