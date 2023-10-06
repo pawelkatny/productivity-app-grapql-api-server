@@ -40,6 +40,14 @@ const mockUserInputIncorrectData = {
   password: "password",
 };
 
+const mockUserUpdateData = {
+  name: "John",
+  settings: {
+    defaultView: "year",
+    taskRequestLimit: 100,
+  },
+};
+
 describe("User resolver", () => {
   describe("registerUser", () => {
     it("should register user and return auth token data", async () => {
@@ -465,14 +473,6 @@ describe("User resolver", () => {
         authUser: true,
       };
 
-      const mockUserUpdateData = {
-        name: "John",
-        settings: {
-          defaultView: "year",
-          taskRequestLimit: 100,
-        },
-      };
-
       const lastLoginDate = new Date();
 
       jest.spyOn(User, "findById").mockImplementationOnce(() => user);
@@ -510,14 +510,6 @@ describe("User resolver", () => {
         authUser: false,
       };
 
-      const mockUserUpdateData = {
-        name: "John",
-        settings: {
-          defaultView: "year",
-          taskRequestLimit: 100,
-        },
-      };
-
       const res = await server.executeOperation(
         {
           query: `mutation Mutation($input: UpdateUserInput!) {updateUser(input: $input) { name settings {defaultView taskRequestLimit} lastLoginDate }}`,
@@ -543,14 +535,6 @@ describe("User resolver", () => {
       const contextValue = {
         db: context.db,
         authUser: true,
-      };
-
-      const mockUserUpdateData = {
-        name: "John",
-        settings: {
-          defaultView: "year",
-          taskRequestLimit: 100,
-        },
       };
 
       jest.spyOn(User, "findById").mockImplementationOnce(() => null);

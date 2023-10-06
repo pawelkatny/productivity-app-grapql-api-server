@@ -15,10 +15,12 @@ module.exports = {
         throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
       }
 
+      const { name, settings, lastLoginDate } = user;
+
       return {
-        name: user.name,
-        settings: user.settings,
-        lastLoginDate: user.lastLoginDate.toISOString(),
+        name,
+        settings,
+        lastLoginDate: lastLoginDate.toISOString(),
       };
     },
   },
