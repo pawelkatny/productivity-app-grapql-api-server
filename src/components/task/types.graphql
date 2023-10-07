@@ -31,4 +31,5 @@ type Mutation {
 
 type Query {
   getTask(id: ID!): Task!
+  getTasks(params: TasksQueryParams!): [Task!]!
 }
