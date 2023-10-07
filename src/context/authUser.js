@@ -26,8 +26,8 @@ const authUser = async (req) => {
   const { settings } = user;
 
   return {
-    isAuth: true,
     userId,
+    settings,
   };
 };
 
