@@ -23,6 +23,7 @@ input TasksQueryParams {
   type: String!
   start: String!
   end: String
+  page: Int = 0
 }
 
 type Mutation {
