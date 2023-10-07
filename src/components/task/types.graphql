@@ -11,6 +11,12 @@ type Task {
   updatedAt: String!
 }
 
+type Tasks {
+  tasks: [Task!]!
+  count: Int!
+  nextPage: Int!
+}
+
 input CreateTaskInput {
   name: String!
   type: String!
