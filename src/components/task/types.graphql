@@ -19,6 +19,12 @@ input CreateTaskInput {
   priority: Int
 }
 
+input TasksQueryParams {
+  type: String!
+  start: String!
+  end: String
+}
+
 type Mutation {
   createTask(input: CreateTaskInput!): Task!
 }
