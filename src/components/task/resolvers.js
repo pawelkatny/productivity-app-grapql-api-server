@@ -25,6 +25,50 @@ module.exports = {
 
       return prepareTaskTypeObject(task);
     },
+    getTasks: async (
+      parent,
+      { params: type, start, end, page },
+      { authUser, db: { Task, User } },
+      info
+    ) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+      const { userId, settings: userSettings } = authUser;
+      let dateStart, endStart;
+
+      dateStart = new Date(start).toDateString();
+      endStart = new Date(end).toDateString();
+      if (start == end) endStart = endStart.setDate(endStart.getDate() + 1);
+      if (type == "year") {
+        const year = dateStart.getYear();
+        dateStart = new Date(year, 0).toDateString();
+        endStart = new Date(+year + 1, 0).toDateString();
+      }
+
+      const searchParams = {
+        user: userId,
+        type,
+        date: {
+          $gte: dateStart,
+          $lt: endStart,
+        },
+      };
+
+      const tasksCount = await Task.countDocuments(searchParams);
+      const tasks = await Task.find(searchParams)
+        .skip(page)
+        .limit(userSettings.taskRequestLimit);
+      const nextPage =
+        page * userSettings.taskRequestLimit >= tasksCount ? 0 : page + 1;
+      const tasksMapped = tasks.map((task) => prepareTaskTypeObject(task));
+
+      return {
+        tasks: tasksMapped,
+        count: tasksCount,
+        nextPage,
+      };
+    },
   },
   Mutation: {
     createTask: async (parent, { input }, { authUser, db: { Task } }, info) => {
