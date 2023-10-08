@@ -27,7 +27,7 @@ module.exports = {
     },
     getTasks: async (
       parent,
-      { params: type, start, end, page },
+      { params: { type, start, end, page } },
       { authUser, db: { Task, User } },
       info
     ) => {
@@ -37,8 +37,9 @@ module.exports = {
       const { userId, settings: userSettings } = authUser;
       let dateStart, endStart;
 
-      dateStart = new Date(start).toDateString();
-      endStart = new Date(end).toDateString();
+      dateStart = new Date(start);
+      endStart = new Date(end);
+
       if (start == end) endStart = endStart.setDate(endStart.getDate() + 1);
       if (type == "year") {
         const year = dateStart.getYear();
