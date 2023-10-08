@@ -58,7 +58,8 @@ module.exports = {
       const tasksCount = await Task.countDocuments(searchParams);
       const tasks = await Task.find(searchParams)
         .skip(page)
-        .limit(userSettings.taskRequestLimit);
+        .limit(userSettings.taskRequestLimit)
+        .sort({ priority: "asc" });
       const nextPage =
         page * userSettings.taskRequestLimit >= tasksCount ? 0 : page + 1;
       const tasksMapped = tasks.map((task) => prepareTaskTypeObject(task));
