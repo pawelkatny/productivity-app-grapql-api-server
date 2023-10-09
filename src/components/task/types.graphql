@@ -1,3 +1,9 @@
+enum TaskViewType {
+  day
+  week
+  year
+}
+
 type Task {
   id: ID!
   name: String!
@@ -26,10 +32,10 @@ input CreateTaskInput {
 }
 
 input TasksQueryParams {
-  type: String!
+  type: TaskViewType! = "day"
   start: String!
   end: String
-  page: Int = 0
+  page: Int = 1
 }
 
 type Mutation {
