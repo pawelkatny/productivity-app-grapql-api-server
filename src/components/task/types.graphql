@@ -4,6 +4,18 @@ enum TaskViewType {
   year
 }
 
+type TaskSingleView {
+  tasks: [Task!]!
+  count: Int!
+  nextPage: Int!
+}
+
+type TaskWeekView {
+  tasks: [TaskSingleView!]!
+}
+
+union Tasks = TaskSingleView | TaskWeekView
+
 type Task {
   id: ID!
   name: String!
@@ -15,12 +27,6 @@ type Task {
   priority: Int!
   createdAt: String!
   updatedAt: String!
-}
-
-type Tasks {
-  tasks: [Task!]!
-  count: Int!
-  nextPage: Int!
 }
 
 input CreateTaskInput {
