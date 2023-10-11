@@ -18,49 +18,21 @@ module.exports = {
     },
     getTasks: async (
       parent,
-      { params: { type, start, end, page } },
+      { params },
       { authUser, db: { Task, User } },
       info
     ) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
-      const { userId, settings: userSettings } = authUser;
-      let dateStart, endStart;
+      const { type } = params;
+      let tasks;
 
-      dateStart = new Date(start);
-      endStart = new Date(end);
-
-      if (start == end) endStart = endStart.setDate(endStart.getDate() + 1);
-      if (type == "year") {
-        const year = dateStart.getYear();
-        dateStart = new Date(year, 0).toDateString();
-        endStart = new Date(+year + 1, 0).toDateString();
+      if (type == "day" || type == "year") {
+        tasks = await Task.getSingleList(params, authUser);
       }
 
-      const searchParams = {
-        user: userId,
-        type,
-        date: {
-          $gte: dateStart,
-          $lt: endStart,
-        },
-      };
-
-      const tasksCount = await Task.countDocuments(searchParams);
-      const tasks = await Task.find(searchParams)
-        .skip(page - 1)
-        .limit(userSettings.taskRequestLimit)
-        .sort({ priority: "asc" });
-      const nextPage =
-        page * userSettings.taskRequestLimit >= tasksCount ? 0 : page + 1;
-      const tasksMapped = tasks.map((task) => prepareTaskTypeObject(task));
-
-      return {
-        tasks: tasksMapped,
-        count: tasksCount,
-        nextPage,
-      };
+      return tasks;
     },
   },
   Mutation: {

@@ -78,8 +78,8 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
     },
   };
 
-  const tasksCount = await this.countDocuments(searchParams);
-  const tasks = await this.find(searchParams)
+  const tasksCount = await Task.countDocuments(searchParams);
+  const tasks = await Task.find(searchParams)
     .skip(page - 1)
     .limit(userSettings.taskRequestLimit)
     .sort({ priority: "asc" });
