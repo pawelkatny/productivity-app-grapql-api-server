@@ -3,6 +3,18 @@ const CustomGraphQLerror = require("../../error/customError");
 const { prepareTaskTypeObject } = require("../../helpers");
 
 module.exports = {
+  Tasks: {
+    __resolveType(obj, contextValue, info) {
+      if (obj.count) {
+        return "TaskSingleView";
+      }
+
+      if (!obj.count) {
+        return "TaskWeekView";
+      }
+      return null;
+    },
+  },
   Query: {
     getTask: async (parent, { id }, { authUser, db: { Task } }, info) => {
       if (!authUser) {
