@@ -127,4 +127,61 @@ describe("Task resolver queries", () => {
       expect(res.body.singleResult.data).toEqual(null);
     });
   });
+  describe("getTasks", () => {
+    it("should successfully return task list for specific day", async () => {
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
+      const task = new Task(mockTaskData);
+      task._doc.createdAt = new Date();
+      task._doc.updatedAt = new Date();
+
+      const { _id, name, type, date } = task;
+      const expectedTask = {
+        id: _id.toString(),
+        name,
+        type,
+        date: date.toISOString(),
+      };
+      const contextValue = {
+        db: context.db,
+        authUser: {
+          userId: user._id.toString(),
+        },
+      };
+
+      const params = {
+        type: "day",
+        start: new Date().toISOString(),
+        end: new Date().toISOString(),
+        page: 1,
+      };
+
+      jest.spyOn(Task, "getSingleList").mockImplementationOnce(() => {
+        return {
+          tasks: [expectedTask],
+          count: 1,
+          nextPage: 0,
+        };
+      });
+
+      const res = await server.executeOperation(
+        {
+          query: `query GetTasks($params: TasksQueryParams!) { getTasks(params: $params) { ... on TaskSingleView { tasks {id name type date} count nextPage}}}`,
+          variables: {
+            params,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.data.getTasks).toEqual({
+        tasks: [expectedTask],
+        count: 1,
+        nextPage: 0,
+      });
+      expect(res.body.singleResult.errors).toBeUndefined();
+    });
+  });
 });
