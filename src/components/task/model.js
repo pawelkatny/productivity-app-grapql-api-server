@@ -57,16 +57,20 @@ const taskSchema = mongoose.Schema(
 taskSchema.statics.getSingleList = async (params, authUser) => {
   const { type, start, end, page } = params;
   const { userId, settings: userSettings } = authUser;
-  let dateStart, endStart;
+  let dateStart, endStart, date;
 
   dateStart = new Date(start);
   endStart = new Date(end);
 
-  if (start == end) endStart = endStart.setDate(endStart.getDate() + 1);
+  if (start == end) {
+    endStart = endStart.setDate(endStart.getDate() + 1);
+    date = dateStart.toISOString().split("T")[0];
+  }
   if (type == "year") {
     const year = dateStart.getYear();
     dateStart = new Date(year, 0).toDateString();
     endStart = new Date(+year + 1, 0).toDateString();
+    date = dateStart.toISOString().split("-")[0];
   }
 
   const searchParams = {
@@ -88,6 +92,7 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   const tasksMapped = tasks.map((task) => prepareTaskTypeObject(task));
 
   return {
+    date,
     tasks: tasksMapped,
     count: tasksCount,
     nextPage,
