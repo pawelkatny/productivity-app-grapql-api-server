@@ -5,6 +5,7 @@ enum TaskViewType {
 }
 
 type TaskSingleView {
+  date: String!
   tasks: [Task!]!
   count: Int!
   nextPage: Int!
