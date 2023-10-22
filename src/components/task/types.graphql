@@ -1,6 +1,7 @@
 enum TaskViewType {
   day
   week
+  month
   year
 }
 
