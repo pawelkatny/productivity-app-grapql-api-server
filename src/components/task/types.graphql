@@ -9,6 +9,7 @@ type TaskSingleView {
   date: String!
   tasks: [Task!]!
   count: Int!
+  page: Int!
   nextPage: Int!
 }
 
