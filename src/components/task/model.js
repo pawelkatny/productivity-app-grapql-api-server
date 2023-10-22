@@ -62,23 +62,24 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   dateStart = new Date(start);
   endStart = new Date(end);
 
-  if (start == end) {
-    endStart = endStart.setDate(endStart.getDate() + 1);
+  if (type == "day") {
     date = dateStart.toISOString().split("T")[0];
+    endStart = new Date(start);
+    endStart = new Date(endStart.setDate(endStart.getDate() + 1));
   }
   if (type == "year") {
-    const year = dateStart.getYear();
-    dateStart = new Date(year, 0).toDateString();
-    endStart = new Date(+year + 1, 0).toDateString();
     date = dateStart.toISOString().split("-")[0];
+    const year = dateStart.getFullYear();
+    dateStart = new Date(year, 0);
+    endStart = new Date(+year + 1, 0);
   }
 
   const searchParams = {
     user: userId,
     type,
     date: {
-      $gte: dateStart,
-      $lt: endStart,
+      $gte: dateStart.toDateString(),
+      $lt: endStart.toDateString(),
     },
   };
 
