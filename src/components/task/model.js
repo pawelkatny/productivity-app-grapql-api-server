@@ -96,6 +96,7 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
     date,
     tasks: tasksMapped,
     count: tasksCount,
+    page,
     nextPage,
   };
 };
