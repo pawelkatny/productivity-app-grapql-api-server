@@ -101,6 +101,80 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   };
 };
 
+taskSchema.statics.getArrayList = async (params, authUser) => {
+  const { type, start, end, page } = params;
+  const { userId, settings: userSettings } = authUser;
+  let dateStart, endStart, date;
+
+  dateStart = new Date(start);
+  endStart = new Date(end);
+
+  const searchParams = {
+    user: userId,
+    type,
+    date: {
+      $gte: dateStart.toDateString(),
+      $lt: endStart.toDateString(),
+    },
+  };
+
+  const tasks = await Task.aggregate([
+    {
+      $match: searchParams,
+      $group: {
+        id: {
+          $dateToString: { format: "%Y-%m-%d", date: "$date" },
+        },
+        tasks: { $push: "$$ROOT" },
+        count: { $sum: 1 },
+      },
+      $addFields: {
+        tasks: {
+          $map: {
+            input: "$tasks",
+            as: "task",
+            in: {
+              $mergeObjects: [
+                "$$task",
+                {
+                  id: {
+                    $toString: "$$task._id",
+                  },
+                  date: {
+                    $toString: "$$task.date",
+                  },
+                  createdAt: {
+                    $toString: "$$task.date",
+                  },
+                  updatedAt: {
+                    $toString: "$$task.date",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      $project: {
+        _id: 0,
+        date: "$_id",
+        tasks: { $slice: ["$tasks", 2, userSettings.taskRequestLimit] },
+        count: "$count",
+        page: 1,
+        nextPage: {
+          $cond: {
+            if: { $gte: ["$count", userSettings.taskRequestLimit] },
+            then: 2,
+            else: 0,
+          },
+        },
+      },
+    },
+  ]);
+
+  return tasks;
+};
+
 const Task = mongoose.model("Task", taskSchema);
 
 module.exports = Task;
