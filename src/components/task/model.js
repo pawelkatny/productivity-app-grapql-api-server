@@ -101,7 +101,7 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   };
 };
 
-taskSchema.statics.getArrayList = async (params, authUser) => {
+taskSchema.statics.getAggregatedList = async (params, authUser) => {
   const { type, start, end, page } = params;
   const { userId, settings: userSettings } = authUser;
   let dateStart, endStart, date;

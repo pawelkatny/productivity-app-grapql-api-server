@@ -45,7 +45,7 @@ module.exports = {
       }
 
       if (type == "week" || type == "month") {
-        tasks = await Task.getArrayList(params, authUser);
+        tasks = await Task.getAggregatedList(params, authUser);
       }
 
       return tasks;
