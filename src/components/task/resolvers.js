@@ -44,6 +44,10 @@ module.exports = {
         tasks = await Task.getSingleList(params, authUser);
       }
 
+      if (type == "week" || type == "month") {
+        tasks = await Task.getArrayList(params, authUser);
+      }
+
       return tasks;
     },
   },

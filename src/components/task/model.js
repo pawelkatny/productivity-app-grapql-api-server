@@ -110,24 +110,28 @@ taskSchema.statics.getArrayList = async (params, authUser) => {
   endStart = new Date(end);
 
   const searchParams = {
-    user: userId,
-    type,
+    user: new mongoose.Types.ObjectId(userId),
+    type: "day",
     date: {
-      $gte: dateStart.toDateString(),
-      $lt: endStart.toDateString(),
+      $gte: dateStart,
+      $lt: endStart,
     },
   };
 
   const tasks = await Task.aggregate([
     {
       $match: searchParams,
+    },
+    {
       $group: {
-        id: {
+        _id: {
           $dateToString: { format: "%Y-%m-%d", date: "$date" },
         },
         tasks: { $push: "$$ROOT" },
         count: { $sum: 1 },
       },
+    },
+    {
       $addFields: {
         tasks: {
           $map: {
@@ -144,10 +148,10 @@ taskSchema.statics.getArrayList = async (params, authUser) => {
                     $toString: "$$task.date",
                   },
                   createdAt: {
-                    $toString: "$$task.date",
+                    $toString: "$$task.createdAt",
                   },
                   updatedAt: {
-                    $toString: "$$task.date",
+                    $toString: "$$task.updatedAt",
                   },
                 },
               ],
@@ -155,6 +159,8 @@ taskSchema.statics.getArrayList = async (params, authUser) => {
           },
         },
       },
+    },
+    {
       $project: {
         _id: 0,
         date: "$_id",
@@ -172,7 +178,7 @@ taskSchema.statics.getArrayList = async (params, authUser) => {
     },
   ]);
 
-  return tasks;
+  return { tasks };
 };
 
 const Task = mongoose.model("Task", taskSchema);
