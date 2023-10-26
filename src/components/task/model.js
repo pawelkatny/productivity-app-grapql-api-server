@@ -164,7 +164,7 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
       $project: {
         _id: 0,
         date: "$_id",
-        tasks: { $slice: ["$tasks", 2, userSettings.taskRequestLimit] },
+        tasks: { $slice: ["$tasks", 0, userSettings.taskRequestLimit] },
         count: "$count",
         page: 1,
         nextPage: {
