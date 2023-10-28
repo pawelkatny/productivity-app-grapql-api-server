@@ -56,7 +56,10 @@ const taskSchema = mongoose.Schema(
 
 taskSchema.statics.getSingleList = async (params, authUser) => {
   const { type, start, end, page } = params;
-  const { userId, settings: userSettings } = authUser;
+  const {
+    userId,
+    settings: { taskRequestLimit },
+  } = authUser;
   let dateStart, endStart, date;
 
   dateStart = new Date(start);
@@ -86,10 +89,9 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   const tasksCount = await Task.countDocuments(searchParams);
   const tasks = await Task.find(searchParams)
     .skip(page - 1)
-    .limit(userSettings.taskRequestLimit)
+    .limit(taskRequestLimit)
     .sort({ priority: "asc" });
-  const nextPage =
-    page * userSettings.taskRequestLimit >= tasksCount ? 0 : page + 1;
+  const nextPage = page * taskRequestLimit >= tasksCount ? 0 : page + 1;
   const tasksMapped = tasks.map((task) => prepareTaskTypeObject(task));
 
   return {
@@ -103,7 +105,10 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
 
 taskSchema.statics.getAggregatedList = async (params, authUser) => {
   const { start, end } = params;
-  const { userId, settings: userSettings } = authUser;
+  const {
+    userId,
+    settings: { taskRequestLimit },
+  } = authUser;
   let dateStart, endStart;
 
   dateStart = new Date(start);
@@ -165,7 +170,7 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
         _id: 0,
         date: "$_id",
         tasks: {
-          $slice: ["$tasks", 0, userSettings.taskRequestLimit],
+          $slice: ["$tasks", 0, taskRequestLimit],
         },
         tasks: {
           $sortArray: { input: "$tasks", sortBy: { priority: 1 } },
@@ -174,7 +179,7 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
         page: 1,
         nextPage: {
           $cond: {
-            if: { $gte: ["$count", userSettings.taskRequestLimit] },
+            if: { $gte: ["$count", taskRequestLimit] },
             then: 2,
             else: 0,
           },
