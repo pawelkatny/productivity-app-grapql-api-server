@@ -114,7 +114,7 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
     type: "day",
     date: {
       $gte: dateStart,
-      $lt: endStart,
+      $lte: endStart,
     },
   };
 
@@ -164,7 +164,12 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
       $project: {
         _id: 0,
         date: "$_id",
-        tasks: { $slice: ["$tasks", 0, userSettings.taskRequestLimit] },
+        tasks: {
+          $slice: ["$tasks", 0, userSettings.taskRequestLimit],
+        },
+        tasks: {
+          $sortArray: { input: "$tasks", sortBy: { priority: 1 } },
+        },
         count: "$count",
         page: 1,
         nextPage: {
