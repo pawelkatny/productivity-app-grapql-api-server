@@ -37,14 +37,14 @@ module.exports = {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
-      const { type } = params;
+      const { view } = params;
       let tasks;
 
-      if (type == "day" || type == "year") {
+      if (view == "day" || view == "year") {
         tasks = await Task.getSingleList(params, authUser);
       }
 
-      if (type == "week" || type == "month") {
+      if (view == "week" || view == "month") {
         tasks = await Task.getAggregatedList(params, authUser);
       }
 
