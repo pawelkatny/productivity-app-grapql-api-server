@@ -150,7 +150,7 @@ describe("Task resolver queries", () => {
       };
 
       const params = {
-        type: "day",
+        view: "day",
         start: new Date().toISOString(),
         end: new Date().toISOString(),
         page: 1,
@@ -166,7 +166,7 @@ describe("Task resolver queries", () => {
 
       const res = await server.executeOperation(
         {
-          query: `query GetTasks($params: TasksQueryParams!) { getTasks(params: $params) { ... on TaskSingleView { tasks {id name type date} count nextPage}}}`,
+          query: `query GetTasks($params: TasksQueryParams!) { getTasks(params: $params) { ... on TaskSingleListView { tasks {id name type date} count nextPage}}}`,
           variables: {
             params,
           },
