@@ -6,11 +6,11 @@ module.exports = {
   Tasks: {
     __resolveType(obj, contextValue, info) {
       if (obj.count) {
-        return "TaskSingleView";
+        return "TaskSingleListView";
       }
 
       if (!obj.count) {
-        return "TaskWeekView";
+        return "TaskAggregatedListView";
       }
       return null;
     },
