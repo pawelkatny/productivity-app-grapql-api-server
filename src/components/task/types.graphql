@@ -5,7 +5,7 @@ enum TaskViewType {
   year
 }
 
-type TaskSingleView {
+type TaskSingleListView {
   date: String!
   tasks: [Task!]!
   count: Int!
@@ -13,11 +13,11 @@ type TaskSingleView {
   nextPage: Int!
 }
 
-type TaskWeekView {
-  tasks: [TaskSingleView!]!
+type TaskAggregatedListView {
+  tasks: [TaskSingleListView!]!
 }
 
-union Tasks = TaskSingleView | TaskWeekView
+union Tasks = TaskSingleListView | TaskAggregatedListView
 
 type Task {
   id: ID!
@@ -41,7 +41,7 @@ input CreateTaskInput {
 }
 
 input TasksQueryParams {
-  type: TaskViewType! = "day"
+  view: TaskViewType! = "day"
   start: String!
   end: String
   page: Int = 1
