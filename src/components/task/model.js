@@ -55,7 +55,7 @@ const taskSchema = mongoose.Schema(
 );
 
 taskSchema.statics.getSingleList = async (params, authUser) => {
-  const { type, start, end, page } = params;
+  const { view, start, end, page } = params;
   const {
     userId,
     settings: { taskRequestLimit },
@@ -65,12 +65,12 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   dateStart = new Date(start);
   endStart = new Date(end);
 
-  if (type == "day") {
+  if (view == "day") {
     date = dateStart.toISOString().split("T")[0];
     endStart = new Date(start);
     endStart = new Date(endStart.setDate(endStart.getDate() + 1));
   }
-  if (type == "year") {
+  if (view == "year") {
     date = dateStart.toISOString().split("-")[0];
     const year = dateStart.getFullYear();
     dateStart = new Date(year, 0);
@@ -79,7 +79,7 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
 
   const searchParams = {
     user: userId,
-    type,
+    type: view,
     date: {
       $gte: dateStart.toDateString(),
       $lt: endStart.toDateString(),
