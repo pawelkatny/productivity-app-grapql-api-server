@@ -28,12 +28,7 @@ module.exports = {
 
       return prepareTaskTypeObject(task);
     },
-    getTasks: async (
-      parent,
-      { params },
-      { authUser, db: { Task, User } },
-      info
-    ) => {
+    getTasks: async (parent, { params }, { authUser, db: { Task } }, info) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
