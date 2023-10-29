@@ -60,5 +60,18 @@ module.exports = {
 
       return prepareTaskTypeObject(task);
     },
+    updateTask: async (parent, { input }, { authUser, db: { Task } }, info) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+      const { id, dataToUpdate } = input;
+      const task = await Task.findOneAndUpdate({ _id: id }, dataToUpdate);
+
+      if (!task) {
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
+      }
+
+      return prepareTaskTypeObject(task);
+    },
   },
 };
