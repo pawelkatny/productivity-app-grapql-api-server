@@ -40,6 +40,15 @@ input CreateTaskInput {
   priority: Int
 }
 
+input UpdateTaskInput {
+  id: ID!
+  name: String!
+  date: String!
+  isCompleted: Boolean!
+  notes: String!
+  priority: Int!
+}
+
 input TasksQueryParams {
   view: TaskViewType! = "day"
   start: String!
