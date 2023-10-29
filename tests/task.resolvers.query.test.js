@@ -1,7 +1,7 @@
 const apolloServer = require("../src/helpers/mockApolloServer");
 const context = require("../src/context");
 const { StatusCodes, getReasonPhrase } = require("http-status-codes");
-
+const { Query } = require("../src/components/task/resolvers");
 let server;
 
 beforeAll(async () => {
@@ -183,5 +183,80 @@ describe("Task resolver queries", () => {
       });
       expect(res.body.singleResult.errors).toBeUndefined();
     });
+  });
+  it("should succesfully return tasks list for week view", async () => {
+    const { User, Task } = context.db;
+    const user = new User(mockUserData);
+    const task = new Task(mockTaskData);
+
+    const { _id, name, type, date } = task;
+    const { _id: userId, settings } = user;
+    const expectedTask = {
+      id: _id.toString(),
+      name,
+      type,
+      date: date.toISOString(),
+    };
+    const contextValue = {
+      db: context.db,
+      authUser: {
+        userId: userId.toString(),
+        settings,
+      },
+    };
+
+    const params = {
+      view: "week",
+      start: new Date().toISOString(),
+      end: new Date(new Date().getDate() + 6).toISOString(),
+      page: 1,
+    };
+
+    jest.spyOn(Task, "aggregate").mockImplementationOnce(() => {
+      return [
+        {
+          tasks: [expectedTask, expectedTask],
+          count: 2,
+          page: 1,
+          nextPage: 0,
+        },
+      ];
+    });
+
+    const res = await server.executeOperation(
+      {
+        query: `query GetTasks($params: TasksQueryParams!) { getTasks(params: $params) { 
+            ... on TaskAggregatedListView { 
+              tasks {
+                tasks {
+                  id name type date
+                } 
+                count
+                page 
+                nextPage
+              } 
+            }
+          }
+        }`,
+        variables: {
+          params,
+        },
+      },
+      {
+        contextValue,
+      }
+    );
+
+    expect(res.body.singleResult.data.getTasks).toEqual({
+      tasks: [
+        {
+          tasks: [expectedTask, expectedTask],
+          count: 2,
+          page: 1,
+          nextPage: 0,
+        },
+      ],
+    });
+    expect(res.body.singleResult.errors).toBeUndefined();
   });
 });
