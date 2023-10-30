@@ -64,7 +64,7 @@ module.exports = {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
-      const { id, dataToUpdate } = input;
+      const { id, ...dataToUpdate } = input;
       const task = await Task.findOneAndUpdate({ _id: id }, dataToUpdate);
 
       if (!task) {

@@ -54,6 +54,15 @@ const taskSchema = mongoose.Schema(
   }
 );
 
+taskSchema.pre("save", async function () {
+  const updatedFields = this.modifiedPaths();
+  if (updatedFields.includes("isCompleted")) {
+    if (this.isCompleted && !this.completionDate) {
+      this.completionDate = new Date();
+    }
+  }
+});
+
 taskSchema.statics.getSingleList = async (params, authUser) => {
   const { view, start, end, page } = params;
   const {
