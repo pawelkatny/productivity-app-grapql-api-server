@@ -60,6 +60,10 @@ taskSchema.pre("save", async function () {
     if (this.isCompleted && !this.completionDate) {
       this.completionDate = new Date();
     }
+
+    if (!this.isCompleted && this.completionDate) {
+      this.completionDate = null;
+    }
   }
 });
 
