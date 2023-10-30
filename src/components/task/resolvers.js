@@ -65,12 +65,17 @@ module.exports = {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
       const { id, ...dataToUpdate } = input;
-      const task = await Task.findOneAndUpdate({ _id: id }, dataToUpdate);
+      const task = await Task.findById(id);
 
       if (!task) {
         throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
       }
 
+      for (const key in dataToUpdate) {
+        task[key] = dataToUpdate[key];
+      }
+
+      await task.save();
       return prepareTaskTypeObject(task);
     },
   },
