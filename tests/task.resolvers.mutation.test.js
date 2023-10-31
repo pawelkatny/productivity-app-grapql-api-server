@@ -176,5 +176,41 @@ describe("Task resolver mutations", () => {
       });
       expect(res.body.singleResult.errors).toBeUndefined();
     });
+    it("should throw error when task was not found", async () => {
+      const { Task } = context.db;
+      const task = new Task(mockTaskData);
+
+      const contextValue = {
+        db: context.db,
+        authUser: true,
+      };
+
+      jest.spyOn(Task, "findById").mockImplementationOnce(() => {
+        return null;
+      });
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateTaskInput!) { updateTask(input: $input) { id name notes isCompleted }}`,
+          variables: {
+            input: {
+              ...mockUpdatedTaskData,
+              id: task._id.toString(),
+            },
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
+        "NOT FOUND"
+      );
+      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
+        StatusCodes.NOT_FOUND
+      );
+      expect(res.body.singleResult.data).toEqual(null);
+    });
   });
 });
