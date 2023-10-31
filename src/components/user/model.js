@@ -48,7 +48,7 @@ const userSchema = mongoose.Schema(
     settings: {
       defaultView: {
         type: String,
-        enum: ["day", "year"],
+        enum: ["day", "year", "week", "month"],
         default: "day",
       },
       taskRequestLimit: {
