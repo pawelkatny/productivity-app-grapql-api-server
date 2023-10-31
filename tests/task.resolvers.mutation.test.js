@@ -213,4 +213,38 @@ describe("Task resolver mutations", () => {
       expect(res.body.singleResult.data).toEqual(null);
     });
   });
+  describe("deleteTask", () => {
+    it("should successfully delete task", async () => {
+      const { Task } = context.db;
+      const task = new Task(mockTaskData);
+      const deleteTaskId = task._id.toString();
+      const contextValue = {
+        db: context.db,
+        authUser: true,
+      };
+
+      const findByIdAndDelete = jest
+        .spyOn(Task, "findByIdAndDelete")
+        .mockImplementationOnce(() => true);
+      jest.spyOn(Task, "exists").mockImplementationOnce(() => {
+        return false;
+      });
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($deleteTaskId: ID!) { deleteTask(id: $deleteTaskId)}`,
+          variables: {
+            deleteTaskId,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      expect(findByIdAndDelete).toHaveBeenCalledWith(deleteTaskId);
+      expect(res.body.singleResult.data.deleteTask).toBeTruthy();
+      expect(res.body.singleResult.errors).toBeUndefined();
+    });
+  });
 });
