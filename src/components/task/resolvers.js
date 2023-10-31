@@ -78,5 +78,15 @@ module.exports = {
       await task.save();
       return prepareTaskTypeObject(task);
     },
+    deleteTask: async (parent, { id }, { authUser, db: { Task } }, info) => {
+      if (!authUser) {
+        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      }
+
+      await Task.findByIdAndDelete(id);
+      const taskExists = await Task.exists({ _id: id });
+
+      return !taskExists ? true : false;
+    },
   },
 };

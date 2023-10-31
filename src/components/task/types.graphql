@@ -59,6 +59,7 @@ input TasksQueryParams {
 type Mutation {
   createTask(input: CreateTaskInput!): Task!
   updateTask(input: UpdateTaskInput!): Task!
+  deleteTask(id: ID!): Boolean!
 }
 
 type Query {
