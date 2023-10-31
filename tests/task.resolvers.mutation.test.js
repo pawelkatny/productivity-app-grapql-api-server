@@ -25,6 +25,14 @@ const mockTaskData = {
   notes: "Test description",
 };
 
+const mockUpdatedTaskData = {
+  name: "Updated test task",
+  notes: "Updated test description",
+  date: "2023-10-23",
+  isCompleted: true,
+  priority: 2,
+};
+
 describe("Task resolver mutations", () => {
   describe("createTask", () => {
     it("should successfully create new task", async () => {
@@ -122,6 +130,51 @@ describe("Task resolver mutations", () => {
         StatusCodes.INTERNAL_SERVER_ERROR
       );
       expect(res.body.singleResult.data).toEqual(null);
+    });
+  });
+  describe("updateTask", () => {
+    it("should successfully update task", async () => {
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
+      const task = new Task({ ...mockTaskData, user: user._id });
+      mockUpdatedTaskData.id = task._id.toString();
+
+      const contextValue = {
+        db: context.db,
+        authUser: {
+          userId: user._id.toString(),
+        },
+      };
+
+      jest.spyOn(Task, "findById").mockImplementationOnce(() => {
+        task._doc.createdAt = new Date();
+        task._doc.updatedAt = new Date();
+        return task;
+      });
+      jest.spyOn(task, "save").mockImplementationOnce(() => {
+        return mockUpdatedTaskData;
+      });
+
+      const res = await server.executeOperation(
+        {
+          query: `mutation Mutation($input: UpdateTaskInput!) { updateTask(input: $input) { id name notes isCompleted }}`,
+          variables: {
+            input: mockUpdatedTaskData,
+          },
+        },
+        {
+          contextValue,
+        }
+      );
+
+      const { id, name, notes, isCompleted } = mockUpdatedTaskData;
+      expect(res.body.singleResult.data.updateTask).toEqual({
+        id,
+        name,
+        notes,
+        isCompleted,
+      });
+      expect(res.body.singleResult.errors).toBeUndefined();
     });
   });
 });
