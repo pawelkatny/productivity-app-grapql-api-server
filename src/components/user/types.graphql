@@ -13,6 +13,11 @@ type UserToken {
   token: Token!
 }
 
+type UserDataOnLogin {
+  user: User
+  tasks: Tasks!
+}
+
 type User {
   name: String!
   settings: UserSettings!
