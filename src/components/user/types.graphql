@@ -15,7 +15,7 @@ type UserToken {
 
 type UserDataOnLogin {
   user: User
-  tasks: Tasks!
+  auth: UserToken!
 }
 
 type User {
@@ -55,8 +55,8 @@ input UpdateUserInput {
 }
 
 type Mutation {
-  registerUser(input: RegisterUserInput!): UserToken!
-  loginUser(input: LoginUserInput!): UserToken!
+  registerUser(input: RegisterUserInput!): UserDataOnLogin!
+  loginUser(input: LoginUserInput!): UserDataOnLogin!
   deleteUser(input: DeleteUserInput!): Boolean!
   changeUserPassword(input: ChangeUserPasswordInput!): Boolean!
   updateUser(input: UpdateUserInput!): User!
