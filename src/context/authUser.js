@@ -31,12 +31,7 @@ const authUser = async (req) => {
     throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
   }
 
-  const { settings } = user;
-
-  return {
-    userId,
-    settings,
-  };
+  return user;
 };
 
 module.exports = authUser;
