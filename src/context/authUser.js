@@ -6,7 +6,7 @@ const CustomGraphQLerror = require("../error/customError");
 
 const authUser = async (req) => {
   const authorization = req.headers.authorization;
-  const isUserLogingOrRegistering = ["loginUserr", "registerUser"].some((q) =>
+  const isUserLogingOrRegistering = ["loginUser", "registerUser"].some((q) =>
     req.body.query.includes(q)
   );
 

@@ -5,7 +5,7 @@ const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { jwt } = require("../src/helpers");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
-const mongoose = require("mongoose");
+const CustomGraphQLerror = require("../src/error/customError");
 
 let server;
 
@@ -14,6 +14,10 @@ jest.mock("../src/config", () => ({
   JWT_SECRET: "secret",
   JWT_EXPIRATION: "1h",
 }));
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
 
 beforeAll(async () => {
   server = apolloServer.create();
@@ -195,26 +199,22 @@ describe("User resolver", () => {
   describe("delteUser", () => {
     it("should successfully delete user and connected tasks", async () => {
       const { User, Task } = context.db;
-      const user = new User();
+      const user = new User(mockUserInputData);
       const password = "password";
-      const authUser = {
-        userId: user._id.toString(),
-      };
 
       const contextValue = {
+        authUser: user,
         db: context.db,
-        authUser,
       };
 
-      const userFindById = jest
-        .spyOn(User, "findById")
-        .mockImplementationOnce(() => user);
       const userFindByIdAndDelete = jest.spyOn(User, "findByIdAndDelete");
       const userExists = jest
         .spyOn(User, "exists")
         .mockResolvedValueOnce(false);
       const taskDeleteMany = jest.spyOn(Task, "deleteMany");
-      jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(true);
+
+      const comparePwd = jest.spyOn(user, "comparePwd");
+      const compare = jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(true);
 
       const res = await server.executeOperation(
         {
@@ -229,28 +229,21 @@ describe("User resolver", () => {
           contextValue,
         }
       );
-
-      expect(userFindById).toBeCalledWith(authUser.userId);
-      expect(taskDeleteMany).toBeCalledWith({ user: authUser.userId });
-      expect(userFindByIdAndDelete).toBeCalledWith(authUser.userId);
+      expect(comparePwd).toBeCalledWith(password);
+      expect(compare).toBeCalledTimes(1);
+      expect(taskDeleteMany).toBeCalledWith({ user: user._id });
+      expect(userFindByIdAndDelete).toBeCalledWith(user._id);
       expect(res.body.singleResult.data.deleteUser).toEqual(true);
     });
     it("should return error when user not found", async () => {
       const { User, Task } = context.db;
       const user = new User();
       const password = "password";
-      const authUser = {
-        userId: user._id.toString(),
-      };
 
       const contextValue = {
         db: context.db,
-        authUser,
+        authUser: throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED),
       };
-
-      const userFindById = jest
-        .spyOn(User, "findById")
-        .mockImplementationOnce(() => null);
 
       const res = await server.executeOperation(
         {
@@ -265,12 +258,12 @@ describe("User resolver", () => {
           contextValue,
         }
       );
-
+      console.log(res.body.singleResult);
       expect(res.body.singleResult.errors[0].extensions.code).toEqual(
-        "NOT FOUND"
+        "UNAUTHORIZED"
       );
       expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        StatusCodes.NOT_FOUND
+        StatusCodes.UNAUTHORIZED
       );
       expect(res.body.singleResult.data).toEqual(null);
     });

@@ -5,17 +5,7 @@ const { prepareUserOnLoginObject } = require("../../helpers");
 module.exports = {
   Query: {
     getUser: async (parent, args, { authUser, db: { User } }, info) => {
-      if (!authUser) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-      }
-
-      const user = await User.findById(authUser.userId);
-
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
-      }
-
-      const { name, settings, lastLoginDate } = user;
+      const { name, settings, lastLoginDate } = authUser;
 
       return {
         name,
@@ -64,25 +54,15 @@ module.exports = {
       return prepareUserOnLoginObject(user, token);
     },
     deleteUser: async (parent, { input }, { authUser, db: { User } }, info) => {
-      if (!authUser) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-      }
-
-      const user = await User.findById(authUser.userId);
-
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
-      }
-
-      const isPwdCorrect = await user.comparePwd(input.password);
+      const isPwdCorrect = await authUser.comparePwd(input.password);
 
       if (!isPwdCorrect) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
-      await Task.deleteMany({ user: authUser.userId });
-      await User.findByIdAndDelete(authUser.userId);
-      const userExists = await User.exists({ _id: authUser.userId });
+      await Task.deleteMany({ user: authUser._id });
+      await User.findByIdAndDelete(authUser._id);
+      const userExists = await User.exists({ _id: authUser._id });
 
       return !userExists ? true : false;
     },
@@ -92,24 +72,14 @@ module.exports = {
       { authUser, db: { User } },
       info
     ) => {
-      if (!authUser) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-      }
-
-      const user = await User.findById(authUser.userId);
-
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
-      }
-
-      const isOldPwdCorrect = await user.comparePwd(input.oldPassword);
+      const isOldPwdCorrect = await authUser.comparePwd(input.oldPassword);
 
       if (!isOldPwdCorrect) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
-      user.password = input.newPassword;
-      const updatedUser = await user.save();
+      authUser.password = input.newPassword;
+      const updatedUser = await authUser.save();
 
       if (!updatedUser) {
         throw new CustomGraphQLerror(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -123,19 +93,9 @@ module.exports = {
       { authUser, db: { User } },
       info
     ) => {
-      if (!authUser) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-      }
-
-      const user = await User.findById(authUser.userId);
-
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
-      }
-
-      user.name = name;
-      user.settings = settings;
-      const updatedUser = await user.save();
+      authUser.name = name;
+      authUser.settings = settings;
+      const updatedUser = await authUser.save();
 
       return {
         name: updatedUser.name,
