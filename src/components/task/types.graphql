@@ -42,11 +42,11 @@ input CreateTaskInput {
 
 input UpdateTaskInput {
   id: ID!
-  name: String!
-  date: String!
-  isCompleted: Boolean!
-  notes: String!
-  priority: Int!
+  name: String
+  date: String
+  isCompleted: Boolean
+  notes: String
+  priority: Int
 }
 
 input TasksQueryParams {
