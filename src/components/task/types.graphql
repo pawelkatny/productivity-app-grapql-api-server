@@ -1,3 +1,68 @@
+enum TaskViewType {
+  day
+  week
+  month
+  year
+}
+
+type TaskSingleListView {
+  date: String!
+  tasks: [Task!]!
+  count: Int!
+  page: Int!
+  nextPage: Int!
+}
+
+type TaskAggregatedListView {
+  tasks: [TaskSingleListView!]!
+}
+
+union Tasks = TaskSingleListView | TaskAggregatedListView
+
+type Task {
+  id: ID!
+  name: String!
+  type: String!
+  date: String!
+  isCompleted: Boolean!
+  completionDate: String
+  notes: String
+  priority: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+input CreateTaskInput {
+  name: String!
+  type: String!
+  notes: String
+  date: String
+  priority: Int
+}
+
+input UpdateTaskInput {
+  id: ID!
+  name: String
+  date: String
+  isCompleted: Boolean
+  notes: String
+  priority: Int
+}
+
+input TasksQueryParams {
+  view: TaskViewType! = "day"
+  start: String!
+  end: String
+  page: Int = 1
+}
+
+type Mutation {
+  createTask(input: CreateTaskInput!): Task!
+  updateTask(input: UpdateTaskInput!): Task!
+  deleteTask(id: ID!): Boolean!
+}
+
 type Query {
-  task: String
+  getTask(id: ID!): Task!
+  getTasks(params: TasksQueryParams!): Tasks!
 }
