@@ -40,11 +40,15 @@ describe("User resolver queries", () => {
       const contextValue = {
         db: context.db,
         authUser: {
-          userId: user._id.toString(),
+          name: user.name,
+          settings: user.settings,
+          lastLoginDate: new Date(),
         },
       };
 
-      jest.spyOn(User, "findById").mockImplementationOnce(() => user);
+      jest
+        .spyOn(context, "authUser")
+        .mockImplementationOnce(() => contextValue.authUser);
 
       const res = await server.executeOperation(
         {
@@ -55,7 +59,10 @@ describe("User resolver queries", () => {
         }
       );
 
-      expect(res.body.singleResult.data.getUser).toEqual(mockUserObjectData);
+      expect(res.body.singleResult.data.getUser).toBeDefined();
+      expect(res.body.singleResult.data.getUser.lastLoginDate).toEqual(
+        contextValue.authUser.lastLoginDate.toISOString()
+      );
       expect(res.body.singleResult.errors).toBeUndefined();
     });
 
