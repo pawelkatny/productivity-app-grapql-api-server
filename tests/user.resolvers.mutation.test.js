@@ -352,7 +352,7 @@ describe("User resolver", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: true,
+        authUser: user,
       };
 
       const lastLoginDate = new Date();
