@@ -235,38 +235,6 @@ describe("User resolver", () => {
       expect(userFindByIdAndDelete).toBeCalledWith(user._id);
       expect(res.body.singleResult.data.deleteUser).toEqual(true);
     });
-    it("should return error when user not found", async () => {
-      const { User, Task } = context.db;
-      const user = new User();
-      const password = "password";
-
-      const contextValue = {
-        db: context.db,
-        authUser: throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED),
-      };
-
-      const res = await server.executeOperation(
-        {
-          query: `mutation Mutation($input: DeleteUserInput!) {deleteUser(input: $input)}`,
-          variables: {
-            input: {
-              password,
-            },
-          },
-        },
-        {
-          contextValue,
-        }
-      );
-      console.log(res.body.singleResult);
-      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
-        "UNAUTHORIZED"
-      );
-      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        StatusCodes.UNAUTHORIZED
-      );
-      expect(res.body.singleResult.data).toEqual(null);
-    });
     it("should return error when password doesnt match", async () => {
       const { User, Task } = context.db;
       const user = new User();
