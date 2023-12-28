@@ -8,6 +8,14 @@ let server, url;
 
 const bearer = "Bearer eyJhbGciOiJIUzI1NiJ9";
 
+const mockUserUpdateData = {
+  name: "John",
+  settings: {
+    defaultView: "year",
+    taskRequestLimit: 100,
+  },
+};
+
 beforeAll(async () => {
   ({ server, url } = await apolloHttpServer.create());
 });
@@ -61,7 +69,41 @@ describe("User resolver e2e", () => {
         .set("Authorization", bearer)
         .send(queryData);
 
-      console.log(res.body);
+      expect(res.body.errors[0].extensions.code).toEqual("UNAUTHORIZED");
+      expect(res.body.errors[0].extensions.http.status).toEqual(
+        StatusCodes.UNAUTHORIZED
+      );
+      expect(res.body.data).toBeUndefined();
+    });
+  });
+  describe("updateUser", () => {
+    it("should throw error if token is not valid", async () => {
+      jest.spyOn(jwt, "verify").mockImplementationOnce(() => false);
+      const queryData = {
+        query: `
+          mutation Mutation($input: UpdateUserInput!) 
+          {
+            updateUser(input: $input) 
+            { 
+              name 
+              settings 
+              {
+                defaultView 
+                taskRequestLimit
+              } lastLoginDate 
+            }
+          }
+        `,
+        variables: {
+          input: mockUserUpdateData,
+        },
+      };
+
+      const res = await request(url)
+        .post("/")
+        .set("Authorization", bearer)
+        .send(queryData);
+
       expect(res.body.errors[0].extensions.code).toEqual("UNAUTHORIZED");
       expect(res.body.errors[0].extensions.http.status).toEqual(
         StatusCodes.UNAUTHORIZED
