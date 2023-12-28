@@ -236,21 +236,14 @@ describe("User resolver", () => {
       expect(res.body.singleResult.data.deleteUser).toEqual(true);
     });
     it("should return error when password doesnt match", async () => {
-      const { User, Task } = context.db;
+      const { User } = context.db;
       const user = new User();
       const password = "password";
-      const authUser = {
-        userId: user._id.toString(),
-      };
 
       const contextValue = {
         db: context.db,
-        authUser,
+        authUser: user,
       };
-
-      const userFindById = jest
-        .spyOn(User, "findById")
-        .mockImplementationOnce(() => user);
 
       jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(false);
 
