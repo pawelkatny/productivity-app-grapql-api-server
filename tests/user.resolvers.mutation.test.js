@@ -272,27 +272,20 @@ describe("User resolver", () => {
   });
   describe("changeUserPassword", () => {
     it("should successfully change user password", async () => {
-      const { User, Task } = context.db;
+      const { User } = context.db;
       const user = new User({
         ...mockUserInputData,
-        email: mockUserInputData.email + "n",
+        email: mockUserInputData.email,
       });
       const input = {
         oldPassword: mockUserInputData.password,
         newPassword: mockUserInputData.password + "!",
       };
-      const authUser = {
-        userId: user._id.toString(),
-      };
 
       const contextValue = {
         db: context.db,
-        authUser,
+        authUser: user,
       };
-
-      const userFindById = jest
-        .spyOn(User, "findById")
-        .mockImplementationOnce(() => user);
 
       jest.spyOn(user, "save").mockImplementationOnce(() => true);
       jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(true);
