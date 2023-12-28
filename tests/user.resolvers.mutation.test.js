@@ -306,7 +306,12 @@ describe("User resolver", () => {
       expect(res.body.singleResult.data.changeUserPassword).toEqual(true);
       expect(res.body.singleResult.errors).toBeFalsy();
     });
-    it("should throw error if request is missing authUser object", async () => {
+    it("should throw error if password does not match", async () => {
+      const { User } = context.db;
+      const user = new User({
+        ...mockUserInputData,
+        email: mockUserInputData.email,
+      });
       const input = {
         oldPassword: mockUserInputData.password,
         newPassword: mockUserInputData.password + "!",
@@ -314,8 +319,10 @@ describe("User resolver", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: null,
+        authUser: user,
       };
+
+      jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(false);
 
       const res = await server.executeOperation(
         {
