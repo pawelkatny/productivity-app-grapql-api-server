@@ -55,7 +55,7 @@ describe("User resolver", () => {
       const res = await server.executeOperation(
         {
           query:
-            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) {token { accessToken }}}",
+            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) { auth { token { accessToken }}}}",
           variables: {
             input: mockUserInputData,
           },
@@ -67,7 +67,7 @@ describe("User resolver", () => {
 
       expect(res.body.singleResult.errors).toBeUndefined();
       expect(res.body.singleResult.data).toBeDefined();
-      expect(res.body.singleResult.data.registerUser).toEqual({
+      expect(res.body.singleResult.data.registerUser.auth).toEqual({
         token: {
           accessToken: "accessToken",
         },
@@ -78,7 +78,7 @@ describe("User resolver", () => {
       const res = await server.executeOperation(
         {
           query:
-            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) {token { accessToken }}}",
+            "mutation Mutation($input: RegisterUserInput!) {registerUser(input: $input) {auth { token { accessToken }}}}",
           variables: {
             input: mockUserInputIncorrectData,
           },
@@ -119,7 +119,7 @@ describe("User resolver", () => {
       };
       const res = await server.executeOperation(
         {
-          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { token { accessToken }}}`,
+          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { auth { token { accessToken }}}}`,
           variables: {
             input: loginUserInput,
           },
@@ -130,9 +130,9 @@ describe("User resolver", () => {
       );
 
       expect(res.body.singleResult.errors).toBeFalsy();
-      expect(res.body.singleResult.data.loginUser.token.accessToken).toEqual(
-        "accessToken"
-      );
+      expect(
+        res.body.singleResult.data.loginUser.auth.token.accessToken
+      ).toEqual("accessToken");
     });
 
     it("should throw error when email not found", async () => {
@@ -142,7 +142,7 @@ describe("User resolver", () => {
       };
       const res = await server.executeOperation(
         {
-          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { token { accessToken } }}`,
+          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { auth { token { accessToken }}}}`,
           variables: {
             input: loginUserInput,
           },
@@ -171,7 +171,7 @@ describe("User resolver", () => {
       };
       const res = await server.executeOperation(
         {
-          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { token { accessToken } }}`,
+          query: `mutation Mutation($input: LoginUserInput!) {loginUser(input: $input) { auth { token { accessToken }}}}`,
           variables: {
             input: loginUserInput,
           },

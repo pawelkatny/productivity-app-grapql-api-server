@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomGraphQLerror = require("../../error/customError");
 const Task = require("../task/model");
-
+const { prepareUserOnLoginObject } = require("../../helpers");
 module.exports = {
   Query: {
     getUser: async (parent, args, { authUser, db: { User } }, info) => {
@@ -37,7 +37,7 @@ module.exports = {
       await user.save();
       const token = await user.createAuthToken();
 
-      return token;
+      return prepareUserOnLoginObject(user, token);
     },
     loginUser: async (
       parent,
@@ -61,7 +61,7 @@ module.exports = {
       await user.save();
       const token = await user.createAuthToken();
 
-      return token;
+      return prepareUserOnLoginObject(user, token);
     },
     deleteUser: async (parent, { input }, { authUser, db: { User } }, info) => {
       if (!authUser) {

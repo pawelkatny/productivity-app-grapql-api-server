@@ -13,6 +13,11 @@ type UserToken {
   token: Token!
 }
 
+type UserDataOnLogin {
+  user: User
+  auth: UserToken!
+}
+
 type User {
   name: String!
   settings: UserSettings!
@@ -50,8 +55,8 @@ input UpdateUserInput {
 }
 
 type Mutation {
-  registerUser(input: RegisterUserInput!): UserToken!
-  loginUser(input: LoginUserInput!): UserToken!
+  registerUser(input: RegisterUserInput!): UserDataOnLogin!
+  loginUser(input: LoginUserInput!): UserDataOnLogin!
   deleteUser(input: DeleteUserInput!): Boolean!
   changeUserPassword(input: ChangeUserPasswordInput!): Boolean!
   updateUser(input: UpdateUserInput!): User!
