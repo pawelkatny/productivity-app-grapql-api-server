@@ -5,13 +5,14 @@ const { StatusCodes } = require("http-status-codes");
 const CustomGraphQLerror = require("../error/customError");
 
 const authUser = async (req) => {
+  const nonAuthQueries = ["loginUser", "registerUser", "IntrospectionQuery"];
   const authorization = req.headers.authorization;
-  const isUserLogingOrRegistering = ["loginUser", "registerUser"].some((q) =>
+  const isUserLogingOrRegistering = nonAuthQueries.some((q) =>
     req.body.query.includes(q)
   );
 
   //skip the authorization process if user is loging in or registering
-  if (isUserLogingOrRegistering) null;
+  if (isUserLogingOrRegistering) return null;
 
   if (!authorization || !authorization.startsWith("Bearer")) {
     throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
