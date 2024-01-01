@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const sign = (data, secret, options = null) => {
   return new Promise((resolve, reject) => {
-    jwt.sign(data, secret, null, (err, token) => {
+    jwt.sign(data, secret, options, (err, token) => {
       if (err) {
         reject(err);
       } else {

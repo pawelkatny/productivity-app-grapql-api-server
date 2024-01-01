@@ -24,9 +24,11 @@ const server = new ApolloServer({
   schema,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   formatError: (formattedError, error) => {
-    const { message, extensions } = formattedError;
+    let { message, extensions } = formattedError;
     const originalError = unwrapResolverError(error);
     let errorsPretty = [];
+
+    extensions.http = originalError.extensions.http;
 
     if (extensions.code === ApolloServerErrorCode.INTERNAL_SERVER_ERROR) {
       extensions.http = {
