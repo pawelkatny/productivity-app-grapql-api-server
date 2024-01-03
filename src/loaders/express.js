@@ -28,7 +28,9 @@ const server = new ApolloServer({
     const originalError = unwrapResolverError(error);
     let errorsPretty = [];
 
-    extensions.http = originalError.extensions.http;
+    if (originalError.extensions?.http) {
+      extensions.http = { ...originalError.extensions.http };
+    }
 
     if (extensions.code === ApolloServerErrorCode.INTERNAL_SERVER_ERROR) {
       extensions.http = {

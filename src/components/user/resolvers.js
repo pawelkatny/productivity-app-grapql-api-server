@@ -2,6 +2,9 @@ const { StatusCodes } = require("http-status-codes");
 const CustomGraphQLerror = require("../../error/customError");
 const Task = require("../task/model");
 const { prepareUserOnLoginObject } = require("../../helpers");
+const { REDIS_TKN_BLIST_SET } = require("../../config");
+const { redisClient } = require("../../loaders");
+
 module.exports = {
   Query: {
     getUser: async (parent, args, { auth: { user }, db: { User } }, info) => {
@@ -12,6 +15,10 @@ module.exports = {
         settings,
         lastLoginDate: lastLoginDate.toISOString(),
       };
+    },
+    logoutUser: async (parent, args, { auth: { token } }, info) => {
+      const res = await redisClient.sAdd(REDIS_TKN_BLIST_SET, token);
+      console.log(res);
     },
   },
   Mutation: {
