@@ -42,8 +42,10 @@ describe("Task resolver mutations", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: {
-          userId: user._id.toString(),
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
         },
       };
 
@@ -104,8 +106,10 @@ describe("Task resolver mutations", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: {
-          userId: user._id.toString(),
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
         },
       };
 
@@ -141,8 +145,10 @@ describe("Task resolver mutations", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: {
-          userId: user._id.toString(),
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
         },
       };
 
