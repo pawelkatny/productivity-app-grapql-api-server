@@ -203,7 +203,7 @@ describe("User resolver", () => {
       const password = "password";
 
       const contextValue = {
-        authUser: { user },
+        auth: { user },
         db: context.db,
       };
 
@@ -229,7 +229,6 @@ describe("User resolver", () => {
           contextValue,
         }
       );
-      console.log;
       expect(comparePwd).toBeCalledWith(password);
       expect(compare).toBeCalledTimes(1);
       expect(taskDeleteMany).toBeCalledWith({ user: user._id });
@@ -243,7 +242,7 @@ describe("User resolver", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: { user },
+        auth: { user },
       };
 
       jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(false);
@@ -285,7 +284,7 @@ describe("User resolver", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: { user },
+        auth: { user },
       };
 
       jest.spyOn(user, "save").mockImplementationOnce(() => true);
@@ -320,7 +319,7 @@ describe("User resolver", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: { user },
+        auth: { user },
       };
 
       jest.spyOn(bcrypt, "compare").mockResolvedValueOnce(false);
@@ -353,7 +352,7 @@ describe("User resolver", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: { user },
+        auth: { user },
       };
 
       const lastLoginDate = new Date();

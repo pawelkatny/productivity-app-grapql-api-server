@@ -4,13 +4,8 @@ const Task = require("../task/model");
 const { prepareUserOnLoginObject } = require("../../helpers");
 module.exports = {
   Query: {
-    getUser: async (
-      parent,
-      args,
-      { auth: { authUser }, db: { User } },
-      info
-    ) => {
-      const { name, settings, lastLoginDate } = authUser;
+    getUser: async (parent, args, { auth: { user }, db: { User } }, info) => {
+      const { name, settings, lastLoginDate } = user;
 
       return {
         name,
@@ -61,35 +56,35 @@ module.exports = {
     deleteUser: async (
       parent,
       { input },
-      { auth: { authUser }, db: { User } },
+      { auth: { user }, db: { User } },
       info
     ) => {
-      const isPwdCorrect = await authUser.comparePwd(input.password);
+      const isPwdCorrect = await user.comparePwd(input.password);
 
       if (!isPwdCorrect) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
-      await Task.deleteMany({ user: authUser._id });
-      await User.findByIdAndDelete(authUser._id);
-      const userExists = await User.exists({ _id: authUser._id });
+      await Task.deleteMany({ user: user._id });
+      await User.findByIdAndDelete(user._id);
+      const userExists = await User.exists({ _id: user._id });
 
       return userExists;
     },
     changeUserPassword: async (
       parent,
       { input },
-      { auth: { authUser }, db: { User } },
+      { auth: { user }, db: { User } },
       info
     ) => {
-      const isOldPwdCorrect = await authUser.comparePwd(input.oldPassword);
+      const isOldPwdCorrect = await user.comparePwd(input.oldPassword);
 
       if (!isOldPwdCorrect) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
-      authUser.password = input.newPassword;
-      const updatedUser = await authUser.save();
+      user.password = input.newPassword;
+      const updatedUser = await user.save();
 
       if (!updatedUser) {
         throw new CustomGraphQLerror(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -100,12 +95,12 @@ module.exports = {
     updateUser: async (
       parent,
       { input: { name, settings } },
-      { auth: { authUser }, db: { User } },
+      { auth: { user }, db: { User } },
       info
     ) => {
-      authUser.name = name;
-      authUser.settings = settings;
-      const updatedUser = await authUser.save();
+      user.name = name;
+      user.settings = settings;
+      const updatedUser = await user.save();
 
       return {
         name: updatedUser.name,
