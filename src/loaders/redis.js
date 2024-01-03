@@ -3,6 +3,9 @@ const { createClient } = require("redis");
 
 const redisClient = createClient({
   url: `redis://${config.REDIS_URL}:${config.REDIS_PORT}`,
+  username: config.REDIS_USERNAME,
+  password: config.REDIS_PASSWORD,
+  database: config.REDIS_DB_NUMBER,
 });
 
 redisClient.on("connect", () => {
