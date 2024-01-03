@@ -18,4 +18,6 @@ module.exports = {
   REDIS_PORT: process.env.REDIS_PORT || 6379,
   REDIS_TKN_BLIST_SET: process.env.REDIS_TKN_BLIST_SET || "token_blacklist",
   REDIS_DB_NUMBER: process.env.REDIS_DB_NUMBER || 0,
+  REDIS_USERNAME: process.env.REDIS_USERNAME || "default",
+  REDIS_PASSWORD: process.env.REDIS_PASSWORD,
 };
