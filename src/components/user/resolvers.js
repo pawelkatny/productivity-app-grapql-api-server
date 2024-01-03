@@ -4,7 +4,12 @@ const Task = require("../task/model");
 const { prepareUserOnLoginObject } = require("../../helpers");
 module.exports = {
   Query: {
-    getUser: async (parent, args, { authUser, db: { User } }, info) => {
+    getUser: async (
+      parent,
+      args,
+      { auth: { authUser }, db: { User } },
+      info
+    ) => {
       const { name, settings, lastLoginDate } = authUser;
 
       return {
@@ -53,7 +58,12 @@ module.exports = {
 
       return prepareUserOnLoginObject(user, token);
     },
-    deleteUser: async (parent, { input }, { authUser, db: { User } }, info) => {
+    deleteUser: async (
+      parent,
+      { input },
+      { auth: { authUser }, db: { User } },
+      info
+    ) => {
       const isPwdCorrect = await authUser.comparePwd(input.password);
 
       if (!isPwdCorrect) {
@@ -69,7 +79,7 @@ module.exports = {
     changeUserPassword: async (
       parent,
       { input },
-      { authUser, db: { User } },
+      { auth: { authUser }, db: { User } },
       info
     ) => {
       const isOldPwdCorrect = await authUser.comparePwd(input.oldPassword);
@@ -90,7 +100,7 @@ module.exports = {
     updateUser: async (
       parent,
       { input: { name, settings } },
-      { authUser, db: { User } },
+      { auth: { authUser }, db: { User } },
       info
     ) => {
       authUser.name = name;
