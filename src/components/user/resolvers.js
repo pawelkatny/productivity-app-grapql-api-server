@@ -69,7 +69,7 @@ module.exports = {
       await User.findByIdAndDelete(user._id);
       const userExists = await User.exists({ _id: user._id });
 
-      return userExists;
+      return userExists ? false : true;
     },
     changeUserPassword: async (
       parent,

@@ -356,7 +356,6 @@ describe("User resolver", () => {
       };
 
       const lastLoginDate = new Date();
-      n;
 
       jest.spyOn(User, "findById").mockImplementationOnce(() => user);
 
