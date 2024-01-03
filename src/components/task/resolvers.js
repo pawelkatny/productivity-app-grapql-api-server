@@ -16,7 +16,12 @@ module.exports = {
     },
   },
   Query: {
-    getTask: async (parent, { id }, { authUser, db: { Task } }, info) => {
+    getTask: async (
+      parent,
+      { id },
+      { auth: { authUser }, db: { Task } },
+      info
+    ) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
@@ -28,7 +33,12 @@ module.exports = {
 
       return prepareTaskTypeObject(task);
     },
-    getTasks: async (parent, { params }, { authUser, db: { Task } }, info) => {
+    getTasks: async (
+      parent,
+      { params },
+      { auth: { authUser }, db: { Task } },
+      info
+    ) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
@@ -47,7 +57,12 @@ module.exports = {
     },
   },
   Mutation: {
-    createTask: async (parent, { input }, { authUser, db: { Task } }, info) => {
+    createTask: async (
+      parent,
+      { input },
+      { auth: { authUser }, db: { Task } },
+      info
+    ) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
@@ -60,7 +75,12 @@ module.exports = {
 
       return prepareTaskTypeObject(task);
     },
-    updateTask: async (parent, { input }, { authUser, db: { Task } }, info) => {
+    updateTask: async (
+      parent,
+      { input },
+      { auth: { authUser }, db: { Task } },
+      info
+    ) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
@@ -78,7 +98,12 @@ module.exports = {
       await task.save();
       return prepareTaskTypeObject(task);
     },
-    deleteTask: async (parent, { id }, { authUser, db: { Task } }, info) => {
+    deleteTask: async (
+      parent,
+      { id },
+      { auth: { authUser }, db: { Task } },
+      info
+    ) => {
       if (!authUser) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
