@@ -16,16 +16,11 @@ module.exports = {
     },
   },
   Query: {
-    getTask: async (
-      parent,
-      { id },
-      { auth: { authUser }, db: { Task } },
-      info
-    ) => {
-      if (!authUser) {
+    getTask: async (parent, { id }, { auth: { user }, db: { Task } }, info) => {
+      if (!user) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
-      const task = await Task.findOne({ _id: id, user: authUser.userId });
+      const task = await Task.findOne({ _id: id, user: user.userId });
 
       if (!task) {
         throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
@@ -36,21 +31,21 @@ module.exports = {
     getTasks: async (
       parent,
       { params },
-      { auth: { authUser }, db: { Task } },
+      { auth: { user }, db: { Task } },
       info
     ) => {
-      if (!authUser) {
+      if (!user) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
       const { view } = params;
       let tasks;
 
       if (view == "day" || view == "year") {
-        tasks = await Task.getSingleList(params, authUser);
+        tasks = await Task.getSingleList(params, user);
       }
 
       if (view == "week" || view == "month") {
-        tasks = await Task.getAggregatedList(params, authUser);
+        tasks = await Task.getAggregatedList(params, user);
       }
 
       return tasks;
@@ -60,14 +55,14 @@ module.exports = {
     createTask: async (
       parent,
       { input },
-      { auth: { authUser }, db: { Task } },
+      { auth: { user }, db: { Task } },
       info
     ) => {
-      if (!authUser) {
+      if (!user) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
-      const task = await Task.create({ ...input, user: authUser.userId });
+      const task = await Task.create({ ...input, user: user.userId });
 
       if (!task) {
         throw new CustomGraphQLerror(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -78,10 +73,10 @@ module.exports = {
     updateTask: async (
       parent,
       { input },
-      { auth: { authUser }, db: { Task } },
+      { auth: { user }, db: { Task } },
       info
     ) => {
-      if (!authUser) {
+      if (!user) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
       const { id, ...dataToUpdate } = input;
@@ -101,10 +96,10 @@ module.exports = {
     deleteTask: async (
       parent,
       { id },
-      { auth: { authUser }, db: { Task } },
+      { auth: { user }, db: { Task } },
       info
     ) => {
-      if (!authUser) {
+      if (!user) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
