@@ -1,9 +1,8 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomGraphQLerror = require("../../error/customError");
 const Task = require("../task/model");
-const { prepareUserOnLoginObject } = require("../../helpers");
-const { REDIS_TKN_BLIST_SET } = require("../../config");
-const { redisClient } = require("../../loaders");
+const { prepareUserOnLoginObject, jwt } = require("../../helpers");
+const { JWT_SECRET, REDIS_TKN_BLIST_SET } = require("../../config");
 
 module.exports = {
   Query: {
@@ -16,9 +15,38 @@ module.exports = {
         lastLoginDate: lastLoginDate.toISOString(),
       };
     },
-    logoutUser: async (parent, args, { auth: { token } }, info) => {
-      const res = await redisClient.sAdd(REDIS_TKN_BLIST_SET, token);
-      console.log(res);
+    logoutUser: async (
+      parent,
+      args,
+      {
+        auth: {
+          user: { _id: userId },
+          token,
+        },
+        redisClient,
+      },
+      info
+    ) => {
+      const decoded = await jwt.verify(token, JWT_SECRET);
+      const blacklistedToken = await redisClient.get(userId);
+
+      if (blacklistedToken === token) {
+        return true;
+      }
+
+      const addKeyStatus = await redisClient.set(userId, token);
+
+      if (addKeyStatus !== "OK") {
+        return false;
+      }
+
+      const secondsToExpire = decoded.exp - decoded.iat;
+      const expirationStatus = await redisClient.expire(
+        userId,
+        secondsToExpire
+      );
+
+      return Boolean(expirationStatus);
     },
   },
   Mutation: {

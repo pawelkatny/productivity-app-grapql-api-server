@@ -16,6 +16,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const redisClient = require("./redis");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -64,8 +65,9 @@ module.exports = {
       bodyParser.json(),
       expressMiddleware(server, {
         context: async ({ req }) => ({
-          authUser: await context.authUser(req),
+          auth: await context.authUser(req),
           db: context.db,
+          redisClient,
         }),
       })
     );
