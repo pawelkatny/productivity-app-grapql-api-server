@@ -18,16 +18,10 @@ module.exports = {
     logoutUser: async (
       parent,
       args,
-      {
-        auth: {
-          user: { _id: userId },
-          token,
-        },
-        redisClient,
-      },
+      { auth: { decoded, token }, redisClient },
       info
     ) => {
-      const decoded = await jwt.verify(token, JWT_SECRET);
+      const { userId, exp, iat } = decoded;
       const blacklistedToken = await redisClient.get(userId);
 
       if (blacklistedToken === token) {
@@ -40,7 +34,7 @@ module.exports = {
         return false;
       }
 
-      const secondsToExpire = decoded.exp - decoded.iat;
+      const secondsToExpire = exp - iat;
       const expirationStatus = await redisClient.expire(
         userId,
         secondsToExpire

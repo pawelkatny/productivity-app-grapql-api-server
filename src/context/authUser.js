@@ -33,6 +33,7 @@ const authUser = async (req) => {
   }
 
   return {
+    decoded,
     token,
     user,
   };
