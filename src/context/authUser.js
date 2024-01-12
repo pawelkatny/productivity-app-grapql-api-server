@@ -28,8 +28,8 @@ const authUser = async (req) => {
 
   const { userId } = decoded;
   //check if token was blacklisted
-  const blacklistedToken = await redisClient.get(userId);
-  if (blacklistedToken === token) {
+  const userIdValue = await redisClient.get(token);
+  if (userIdValue === userId) {
     throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
   }
 

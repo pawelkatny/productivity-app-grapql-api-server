@@ -22,23 +22,20 @@ module.exports = {
       info
     ) => {
       const { userId, exp, iat } = decoded;
-      const blacklistedToken = await redisClient.get(userId);
+      const userIdValue = await redisClient.get(userId);
 
-      if (blacklistedToken === token) {
+      if (userIdValue === userId) {
         return true;
       }
 
-      const addKeyStatus = await redisClient.set(userId, token);
+      const addKeyStatus = await redisClient.set(token, userId);
 
       if (addKeyStatus !== "OK") {
         return false;
       }
 
       const secondsToExpire = exp - iat;
-      const expirationStatus = await redisClient.expire(
-        userId,
-        secondsToExpire
-      );
+      const expirationStatus = await redisClient.expire(token, secondsToExpire);
 
       return Boolean(expirationStatus);
     },
