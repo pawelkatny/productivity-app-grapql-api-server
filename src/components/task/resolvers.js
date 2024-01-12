@@ -55,14 +55,15 @@ module.exports = {
     createTask: async (
       parent,
       { input },
-      { auth: { user }, db: { Task } },
+      {
+        auth: {
+          user: { _id: userId },
+        },
+        db: { Task },
+      },
       info
     ) => {
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-      }
-
-      const task = await Task.create({ ...input, user: user.userId });
+      const task = await Task.create({ ...input, user: userId });
 
       if (!task) {
         throw new CustomGraphQLerror(StatusCodes.INTERNAL_SERVER_ERROR);
