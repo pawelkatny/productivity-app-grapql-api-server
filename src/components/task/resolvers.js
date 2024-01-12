@@ -16,11 +16,18 @@ module.exports = {
     },
   },
   Query: {
-    getTask: async (parent, { id }, { auth: { user }, db: { Task } }, info) => {
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-      }
-      const task = await Task.findOne({ _id: id, user: user.userId });
+    getTask: async (
+      parent,
+      { id },
+      {
+        auth: {
+          user: { _id: userId },
+        },
+        db: { Task },
+      },
+      info
+    ) => {
+      const task = await Task.findOne({ _id: id, user: userId });
 
       if (!task) {
         throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
