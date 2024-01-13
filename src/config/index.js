@@ -20,4 +20,5 @@ module.exports = {
   REDIS_DB_NUMBER: process.env.REDIS_DB_NUMBER || 0,
   REDIS_USERNAME: process.env.REDIS_USERNAME || "default",
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+  TASK_PRIORITY: JSON.parse(process.env.TASK_PRIORITY),
 };
