@@ -106,11 +106,18 @@ module.exports = {
     deleteTask: async (
       parent,
       { id },
-      { auth: { user }, db: { Task } },
+      {
+        auth: {
+          user: { _id: userId },
+        },
+        db: { Task },
+      },
       info
     ) => {
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+      const task = await Task.findOne({ _id: id, user: userId });
+
+      if (!task) {
+        throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
       }
 
       await Task.findByIdAndDelete(id);
