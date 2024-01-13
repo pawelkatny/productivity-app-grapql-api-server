@@ -41,12 +41,8 @@ module.exports = {
       { auth: { user }, db: { Task } },
       info
     ) => {
-      if (!user) {
-        throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-      }
       const { view } = params;
       let tasks;
-
       if (view == "day" || view == "year") {
         tasks = await Task.getSingleList(params, user);
       }
