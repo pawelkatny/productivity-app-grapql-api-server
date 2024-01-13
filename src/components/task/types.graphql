@@ -1,3 +1,8 @@
+enum TaskType {
+  day
+  year
+}
+
 enum TaskViewType {
   day
   week
@@ -22,7 +27,7 @@ union Tasks = TaskSingleListView | TaskAggregatedListView
 type Task {
   id: ID!
   name: String!
-  type: String!
+  type: TaskType!
   date: String!
   isCompleted: Boolean!
   completionDate: String
@@ -34,7 +39,7 @@ type Task {
 
 input CreateTaskInput {
   name: String!
-  type: String!
+  type: TaskType!
   notes: String
   date: String
   priority: Int
