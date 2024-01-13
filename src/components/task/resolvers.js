@@ -92,6 +92,10 @@ module.exports = {
         throw new CustomGraphQLerror(StatusCodes.NOT_FOUND);
       }
 
+      if (Object.keys(dataToUpdate).length === 0) {
+        throw new CustomGraphQLerror(StatusCodes.BAD_REQUEST);
+      }
+
       for (const key in dataToUpdate) {
         task[key] = dataToUpdate[key];
       }
