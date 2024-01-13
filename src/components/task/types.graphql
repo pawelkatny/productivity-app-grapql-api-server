@@ -10,6 +10,13 @@ enum TaskViewType {
   year
 }
 
+enum TaskPriority {
+  urgent
+  moderate
+  common
+  low
+}
+
 type TaskSingleListView {
   date: String!
   tasks: [Task!]!
