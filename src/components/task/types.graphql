@@ -39,7 +39,7 @@ type Task {
   isCompleted: Boolean!
   completionDate: String
   notes: String
-  priority: Int!
+  priority: TaskPriority!
   createdAt: String!
   updatedAt: String!
 }
@@ -49,7 +49,7 @@ input CreateTaskInput {
   type: TaskType!
   notes: String
   date: String
-  priority: Int
+  priority: TaskPriority
 }
 
 input UpdateTaskInput {
@@ -58,7 +58,7 @@ input UpdateTaskInput {
   date: String
   isCompleted: Boolean
   notes: String
-  priority: Int
+  priority: TaskPriority
 }
 
 input TasksQueryParams {
