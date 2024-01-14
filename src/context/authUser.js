@@ -3,7 +3,7 @@ const { jwt } = require("../helpers");
 const User = require("../components/user/model");
 const { StatusCodes } = require("http-status-codes");
 const CustomGraphQLerror = require("../error/customError");
-const redisClient = require("../loaders/redis");
+// const redisClient = require("../loaders/redis");
 
 const authUser = async (req) => {
   const NON_AUTH_QUERIES = ["loginUser", "registerUser", "IntrospectionQuery"];
@@ -28,10 +28,10 @@ const authUser = async (req) => {
 
   const { userId } = decoded;
   //check if token was blacklisted
-  const userIdValue = await redisClient.get(token);
-  if (userIdValue === userId) {
-    throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
-  }
+  // const userIdValue = await redisClient.get(token);
+  // if (userIdValue === userId) {
+  //   throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
+  // }
 
   const user = await User.findOne({ _id: userId });
 

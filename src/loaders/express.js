@@ -16,7 +16,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const redisClient = require("./redis");
+// const redisClient = require("./redis");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -67,7 +67,7 @@ module.exports = {
         context: async ({ req }) => ({
           auth: await context.authUser(req),
           db: context.db,
-          redisClient,
+          // redisClient,
         }),
       })
     );
