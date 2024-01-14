@@ -49,10 +49,15 @@ const taskSchema = mongoose.Schema(
       enum: [1, 2, 3, 4],
       default: 1,
       set: (p) => taskPriority[p],
+      get: (p) => {
+        return Object.keys(taskPriority).find((key) => taskPriority[key] === p);
+      },
     },
   },
   {
     timestamps: true,
+    toObject: { getters: true, setters: true },
+    toJSON: { getters: true, setters: true },
   }
 );
 
@@ -170,6 +175,37 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
                   },
                   updatedAt: {
                     $toString: "$$task.updatedAt",
+                  },
+                  priority: {
+                    $switch: {
+                      branches: [
+                        {
+                          case: {
+                            $eq: [taskPriority["urgent"], "$$task.priority"],
+                          },
+                          then: "urgent",
+                        },
+                        {
+                          case: {
+                            $eq: [taskPriority["moderate"], "$$task.priority"],
+                          },
+                          then: "moderate",
+                        },
+                        {
+                          case: {
+                            $eq: [taskPriority["common"], "$$task.priority"],
+                          },
+                          then: "common",
+                        },
+                        {
+                          case: {
+                            $eq: [taskPriority["low"], "$$task.priority"],
+                          },
+                          then: "low",
+                        },
+                      ],
+                      default: "common",
+                    },
                   },
                 },
               ],
