@@ -1,3 +1,5 @@
+const { taskPriority } = require("../helpers");
+
 const prepareTaskTypeObject = (task) => {
   return {
     ...task._doc,
@@ -5,6 +7,7 @@ const prepareTaskTypeObject = (task) => {
     date: task._doc.date.toISOString(),
     createdAt: task._doc.createdAt.toISOString(),
     updatedAt: task._doc.updatedAt.toISOString(),
+    priority: taskPriority[task._doc.priority],
   };
 };
 
