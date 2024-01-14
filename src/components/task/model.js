@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { prepareTaskTypeObject } = require("../../helpers");
+const { taskPriority } = require("../../helpers");
 
 const taskSchema = mongoose.Schema(
   {
@@ -47,6 +48,7 @@ const taskSchema = mongoose.Schema(
       type: Number,
       enum: [1, 2, 3, 4],
       default: 1,
+      set: (p) => taskPriority[p],
     },
   },
   {
