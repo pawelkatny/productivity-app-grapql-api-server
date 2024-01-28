@@ -16,6 +16,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const redisClient = require("./redis");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -28,7 +29,9 @@ const server = new ApolloServer({
     const originalError = unwrapResolverError(error);
     let errorsPretty = [];
 
-    extensions.http = originalError.extensions.http;
+    if (originalError.extensions?.http) {
+      extensions.http = { ...originalError.extensions.http };
+    }
 
     if (extensions.code === ApolloServerErrorCode.INTERNAL_SERVER_ERROR) {
       extensions.http = {
@@ -62,8 +65,9 @@ module.exports = {
       bodyParser.json(),
       expressMiddleware(server, {
         context: async ({ req }) => ({
-          authUser: await context.authUser(req),
+          auth: await context.authUser(req),
           db: context.db,
+          redisClient,
         }),
       })
     );

@@ -39,10 +39,12 @@ describe("User resolver queries", () => {
       const user = new User(mockUserInputData);
       const contextValue = {
         db: context.db,
-        authUser: {
-          name: user.name,
-          settings: user.settings,
-          lastLoginDate: new Date(),
+        auth: {
+          user: {
+            name: user.name,
+            settings: user.settings,
+            lastLoginDate: new Date(),
+          },
         },
       };
 
@@ -57,7 +59,7 @@ describe("User resolver queries", () => {
 
       expect(res.body.singleResult.data.getUser).toBeDefined();
       expect(res.body.singleResult.data.getUser.lastLoginDate).toEqual(
-        contextValue.authUser.lastLoginDate.toISOString()
+        contextValue.auth.user.lastLoginDate.toISOString()
       );
       expect(res.body.singleResult.errors).toBeUndefined();
     });

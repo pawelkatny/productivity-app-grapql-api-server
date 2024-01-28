@@ -1,17 +1,43 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomGraphQLerror = require("../../error/customError");
 const Task = require("../task/model");
-const { prepareUserOnLoginObject } = require("../../helpers");
+const { prepareUserOnLoginObject, jwt } = require("../../helpers");
+const { JWT_SECRET, REDIS_TKN_BLIST_SET } = require("../../config");
+
 module.exports = {
   Query: {
-    getUser: async (parent, args, { authUser, db: { User } }, info) => {
-      const { name, settings, lastLoginDate } = authUser;
+    getUser: async (parent, args, { auth: { user }, db: { User } }, info) => {
+      const { name, settings, lastLoginDate } = user;
 
       return {
         name,
         settings,
         lastLoginDate: lastLoginDate.toISOString(),
       };
+    },
+    logoutUser: async (
+      parent,
+      args,
+      { auth: { decoded, token }, redisClient },
+      info
+    ) => {
+      const { userId, exp, iat } = decoded;
+      const userIdValue = await redisClient.get(userId);
+
+      if (userIdValue === userId) {
+        return true;
+      }
+
+      const addKeyStatus = await redisClient.set(token, userId);
+
+      if (addKeyStatus !== "OK") {
+        return false;
+      }
+
+      const secondsToExpire = exp - iat;
+      const expirationStatus = await redisClient.expire(token, secondsToExpire);
+
+      return Boolean(expirationStatus);
     },
   },
   Mutation: {
@@ -53,33 +79,38 @@ module.exports = {
 
       return prepareUserOnLoginObject(user, token);
     },
-    deleteUser: async (parent, { input }, { authUser, db: { User } }, info) => {
-      const isPwdCorrect = await authUser.comparePwd(input.password);
+    deleteUser: async (
+      parent,
+      { input },
+      { auth: { user }, db: { User } },
+      info
+    ) => {
+      const isPwdCorrect = await user.comparePwd(input.password);
 
       if (!isPwdCorrect) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
-      await Task.deleteMany({ user: authUser._id });
-      await User.findByIdAndDelete(authUser._id);
-      const userExists = await User.exists({ _id: authUser._id });
+      await Task.deleteMany({ user: user._id });
+      await User.findByIdAndDelete(user._id);
+      const userExists = await User.exists({ _id: user._id });
 
-      return userExists;
+      return userExists ? false : true;
     },
     changeUserPassword: async (
       parent,
       { input },
-      { authUser, db: { User } },
+      { auth: { user }, db: { User } },
       info
     ) => {
-      const isOldPwdCorrect = await authUser.comparePwd(input.oldPassword);
+      const isOldPwdCorrect = await user.comparePwd(input.oldPassword);
 
       if (!isOldPwdCorrect) {
         throw new CustomGraphQLerror(StatusCodes.UNAUTHORIZED);
       }
 
-      authUser.password = input.newPassword;
-      const updatedUser = await authUser.save();
+      user.password = input.newPassword;
+      const updatedUser = await user.save();
 
       if (!updatedUser) {
         throw new CustomGraphQLerror(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -90,12 +121,12 @@ module.exports = {
     updateUser: async (
       parent,
       { input: { name, settings } },
-      { authUser, db: { User } },
+      { auth: { user }, db: { User } },
       info
     ) => {
-      authUser.name = name;
-      authUser.settings = settings;
-      const updatedUser = await authUser.save();
+      user.name = name;
+      user.settings = settings;
+      const updatedUser = await user.save();
 
       return {
         name: updatedUser.name,

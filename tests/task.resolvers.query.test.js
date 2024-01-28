@@ -34,8 +34,10 @@ describe("Task resolver queries", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: {
-          userId: user._id.toString(),
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
         },
       };
 
@@ -99,8 +101,10 @@ describe("Task resolver queries", () => {
 
       const contextValue = {
         db: context.db,
-        authUser: {
-          userId: user._id.toString(),
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
         },
       };
 
@@ -144,8 +148,10 @@ describe("Task resolver queries", () => {
       };
       const contextValue = {
         db: context.db,
-        authUser: {
-          userId: user._id.toString(),
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
         },
       };
 
@@ -199,9 +205,11 @@ describe("Task resolver queries", () => {
     };
     const contextValue = {
       db: context.db,
-      authUser: {
-        userId: userId.toString(),
-        settings,
+      auth: {
+        user: {
+          userId: userId.toString(),
+          settings,
+        },
       },
     };
 

@@ -64,4 +64,5 @@ type Mutation {
 
 type Query {
   getUser: User!
+  logoutUser: Boolean!
 }

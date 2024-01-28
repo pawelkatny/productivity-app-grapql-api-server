@@ -70,11 +70,10 @@ taskSchema.pre("save", async function () {
 taskSchema.statics.getSingleList = async (params, authUser) => {
   const { view, start, end, page } = params;
   const {
-    userId,
+    _id: userId,
     settings: { taskRequestLimit },
   } = authUser;
   let dateStart, endStart, date;
-
   dateStart = new Date(start);
   endStart = new Date(end);
 
@@ -119,16 +118,15 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
 taskSchema.statics.getAggregatedList = async (params, authUser) => {
   const { start, end } = params;
   const {
-    userId,
+    _id: userId,
     settings: { taskRequestLimit },
   } = authUser;
   let dateStart, endStart;
-
   dateStart = new Date(start);
   endStart = new Date(end);
 
   const searchParams = {
-    user: new mongoose.Types.ObjectId(userId),
+    user: userId,
     type: "day",
     date: {
       $gte: dateStart,
