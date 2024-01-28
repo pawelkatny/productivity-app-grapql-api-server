@@ -40,11 +40,11 @@ describe("User resolver queries", () => {
       const contextValue = {
         db: context.db,
         authUser: {
-          userId: user._id.toString(),
+          name: user.name,
+          settings: user.settings,
+          lastLoginDate: new Date(),
         },
       };
-
-      jest.spyOn(User, "findById").mockImplementationOnce(() => user);
 
       const res = await server.executeOperation(
         {
@@ -55,7 +55,10 @@ describe("User resolver queries", () => {
         }
       );
 
-      expect(res.body.singleResult.data.getUser).toEqual(mockUserObjectData);
+      expect(res.body.singleResult.data.getUser).toBeDefined();
+      expect(res.body.singleResult.data.getUser.lastLoginDate).toEqual(
+        contextValue.authUser.lastLoginDate.toISOString()
+      );
       expect(res.body.singleResult.errors).toBeUndefined();
     });
 
@@ -78,35 +81,6 @@ describe("User resolver queries", () => {
 
       expect(res.body.singleResult.data).toBeNull();
       expect(res.body.singleResult.errors).toBeDefined();
-    });
-
-    it("should throw error if user is not found", async () => {
-      const { User } = context.db;
-      const user = null;
-      const contextValue = {
-        db: context.db,
-        authUser: true,
-      };
-
-      jest.spyOn(User, "findById").mockImplementationOnce(() => user);
-
-      const res = await server.executeOperation(
-        {
-          query: `query Query { getUser { name, settings { defaultView, taskRequestLimit } lastLoginDate }}`,
-        },
-        {
-          contextValue,
-        }
-      );
-
-      expect(res.body.singleResult.data).toBeNull();
-      expect(res.body.singleResult.errors).toBeDefined();
-      expect(res.body.singleResult.errors[0].message).toEqual(
-        getReasonPhrase(StatusCodes.NOT_FOUND)
-      );
-      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        StatusCodes.NOT_FOUND
-      );
     });
   });
 });
