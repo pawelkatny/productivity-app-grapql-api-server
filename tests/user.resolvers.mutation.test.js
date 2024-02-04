@@ -5,7 +5,6 @@ const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { jwt } = require("../src/helpers");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
-const CustomGraphQLerror = require("../src/error/customError");
 
 let server;
 
