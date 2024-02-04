@@ -14,6 +14,10 @@ jest.mock("../src/config", () => ({
   JWT_EXPIRATION: "1h",
 }));
 
+jest.mock("../src/loaders/redis", () => {
+  return jest.fn();
+});
+
 afterEach(() => {
   jest.restoreAllMocks();
 });
