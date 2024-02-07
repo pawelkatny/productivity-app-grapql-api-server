@@ -7,7 +7,7 @@ const { BCRYPT_SALT, JWT_SECRET, JWT_EXPIRATION } = require("../../config");
 jest.mock("../../config", () => ({
   BCRYPT_SALT: 10,
   JWT_SECRET: "secret",
-  JWT_EXPIRATION: "1h",
+  JWT_EXPIRATION: 3600,
 }));
 
 const defaultUser = {
