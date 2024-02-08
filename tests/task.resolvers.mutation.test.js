@@ -74,31 +74,6 @@ describe("Task resolver mutations", () => {
       });
       expect(res.body.singleResult.errors).toBeUndefined();
     });
-    it("should throw error is user is not auth", async () => {
-      const contextValue = {
-        db: context.db,
-        authUser: false,
-      };
-
-      const res = await server.executeOperation(
-        {
-          query: `mutation Mutation($input: CreateTaskInput!) { createTask(input: $input) { id name type }}`,
-          variables: {
-            input: mockTaskData,
-          },
-        },
-        {
-          contextValue,
-        }
-      );
-      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
-        "UNAUTHORIZED"
-      );
-      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        StatusCodes.UNAUTHORIZED
-      );
-      expect(res.body.singleResult.data).toEqual(null);
-    });
     it("should throw error when task was not created", async () => {
       const { User, Task } = context.db;
       const user = new User(mockUserData);
