@@ -219,6 +219,18 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
       },
     },
     {
+      $set: {
+        tasks: {
+          $sortArray: {
+            input: "$tasks",
+            sortBy: {
+              priority: -1,
+            },
+          },
+        },
+      },
+    },
+    {
       $project: {
         _id: 0,
         date: "$_id",
