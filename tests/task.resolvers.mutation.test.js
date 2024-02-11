@@ -30,7 +30,7 @@ const mockUpdatedTaskData = {
   notes: "Updated test description",
   date: "2023-10-23",
   isCompleted: true,
-  priority: 2,
+  priority: "common",
 };
 
 describe("Task resolver mutations", () => {
@@ -127,7 +127,7 @@ describe("Task resolver mutations", () => {
         },
       };
 
-      jest.spyOn(Task, "findById").mockImplementationOnce(() => {
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => {
         task._doc.createdAt = new Date();
         task._doc.updatedAt = new Date();
         return task;
@@ -148,6 +148,7 @@ describe("Task resolver mutations", () => {
         }
       );
 
+      console.log(res.body.singleResult);
       const { id, name, notes, isCompleted } = mockUpdatedTaskData;
       expect(res.body.singleResult.data.updateTask).toEqual({
         id,
