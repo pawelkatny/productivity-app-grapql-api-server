@@ -224,9 +224,6 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
         tasks: {
           $slice: ["$tasks", 0, taskRequestLimit],
         },
-        tasks: {
-          $sortArray: { input: "$tasks", sortBy: { priority: 1 } },
-        },
         count: "$count",
         page: 1,
         nextPage: {
