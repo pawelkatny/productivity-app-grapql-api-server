@@ -6,8 +6,8 @@ const {
 } = require("@apollo/server/errors");
 const { ValidationError } = require("mongoose").Error;
 const { StatusCodes } = require("http-status-codes");
-const schema = require("../loaders/schema");
-const context = require("../context");
+const schema = require("../src/loaders/schema");
+const context = require("../src/context");
 
 const create = async (listenOpts = { port: 4000 }) => {
   const server = new ApolloServer({

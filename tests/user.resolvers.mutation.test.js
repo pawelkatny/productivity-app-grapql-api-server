@@ -1,5 +1,5 @@
-const apolloServer = require("../src/helpers/mockApolloServer");
-const dbServer = require("../src/helpers/mockDbServer");
+const apolloServer = require("../tests_helpers/mockApolloServer");
+const dbServer = require("../tests_helpers/mockDbServer");
 const context = require("../src/context");
 const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { jwt } = require("../src/helpers");

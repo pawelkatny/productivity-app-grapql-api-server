@@ -1,4 +1,4 @@
-const apolloServer = require("../src/helpers/mockApolloServer");
+const apolloServer = require("../tests_helpers/mockApolloServer");
 const context = require("../src/context");
 const { StatusCodes, getReasonPhrase } = require("http-status-codes");
 const { Query } = require("../src/components/task/resolvers");
