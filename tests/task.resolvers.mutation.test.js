@@ -201,14 +201,19 @@ describe("Task resolver mutations", () => {
   });
   describe("deleteTask", () => {
     it("should successfully delete task", async () => {
-      const { Task } = context.db;
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
       const task = new Task(mockTaskData);
       const deleteTaskId = task._id.toString();
       const contextValue = {
         db: context.db,
-        authUser: true,
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
+        },
       };
-
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => true);
       const findByIdAndDelete = jest
         .spyOn(Task, "findByIdAndDelete")
         .mockImplementationOnce(() => true);
