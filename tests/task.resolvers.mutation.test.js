@@ -148,7 +148,6 @@ describe("Task resolver mutations", () => {
         }
       );
 
-      console.log(res.body.singleResult);
       const { id, name, notes, isCompleted } = mockUpdatedTaskData;
       expect(res.body.singleResult.data.updateTask).toEqual({
         id,
@@ -159,15 +158,20 @@ describe("Task resolver mutations", () => {
       expect(res.body.singleResult.errors).toBeUndefined();
     });
     it("should throw error when task was not found", async () => {
-      const { Task } = context.db;
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
       const task = new Task(mockTaskData);
 
       const contextValue = {
         db: context.db,
-        authUser: true,
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
+        },
       };
 
-      jest.spyOn(Task, "findById").mockImplementationOnce(() => {
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => {
         return null;
       });
 
