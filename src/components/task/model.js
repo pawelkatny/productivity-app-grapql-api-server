@@ -48,7 +48,10 @@ const taskSchema = mongoose.Schema(
       type: Number,
       enum: [1, 2, 3, 4],
       default: 1,
-      set: (p) => taskPriority[p],
+      set: (p) => {
+        const priority = taskPriority[p] || p;
+        return priority;
+      },
       get: (p) => {
         return Object.keys(taskPriority).find((key) => taskPriority[key] === p);
       },
