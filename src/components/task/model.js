@@ -215,6 +215,7 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
             },
           },
         },
+        page: 1,
       },
     },
     {
