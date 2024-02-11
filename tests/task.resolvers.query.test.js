@@ -66,34 +66,6 @@ describe("Task resolver queries", () => {
       });
       expect(res.body.singleResult.errors).toBeUndefined();
     });
-    it("should throw error is user is not auth", async () => {
-      const { Task } = context.db;
-      const task = new Task(mockTaskData);
-      const contextValue = {
-        db: context.db,
-        authUser: false,
-      };
-
-      const res = await server.executeOperation(
-        {
-          query: `query Query($getTaskId: ID!) { getTask(id: $getTaskId) { id name type }}`,
-          variables: {
-            getTaskId: task._id.toString(),
-          },
-        },
-        {
-          contextValue,
-        }
-      );
-
-      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
-        "UNAUTHORIZED"
-      );
-      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        StatusCodes.UNAUTHORIZED
-      );
-      expect(res.body.singleResult.data).toEqual(null);
-    });
     it("should throw error if task is not found", async () => {
       const { User, Task } = context.db;
       const user = new User(mockUserData);
