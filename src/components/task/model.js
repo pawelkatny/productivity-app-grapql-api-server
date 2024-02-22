@@ -109,10 +109,12 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   };
 
   const tasksCount = await Task.countDocuments(searchParams);
+  const toSkip = (page - 1) * taskRequestLimit;
   const tasks = await Task.find(searchParams)
-    .skip(page - 1)
-    .limit(taskRequestLimit)
-    .sort({ priority: "asc" });
+    .sort({ priority: "asc" })
+    .skip(toSkip)
+    .limit(taskRequestLimit);
+
   const nextPage = page * taskRequestLimit >= tasksCount ? 0 : page + 1;
   const tasksMapped = tasks.map((task) => prepareTaskTypeObject(task));
 
