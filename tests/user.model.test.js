@@ -1,13 +1,13 @@
-const dbServer = require("../../helpers/mockDbServer");
+const dbServer = require("../tests_helpers/mockDbServer");
 const bcrypt = require("bcryptjs");
-const User = require("./model");
-const { jwt } = require("../../helpers");
-const { BCRYPT_SALT, JWT_SECRET, JWT_EXPIRATION } = require("../../config");
+const User = require("../src/components/user/model");
+const { jwt } = require("../src/helpers");
+const { BCRYPT_SALT, JWT_SECRET, JWT_EXPIRATION } = require("../src/config");
 
-jest.mock("../../config", () => ({
+jest.mock("../src/config", () => ({
   BCRYPT_SALT: 10,
   JWT_SECRET: "secret",
-  JWT_EXPIRATION: "1h",
+  JWT_EXPIRATION: 3600,
 }));
 
 const defaultUser = {

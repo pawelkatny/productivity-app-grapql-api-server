@@ -52,6 +52,10 @@ const server = new ApolloServer({
       };
     }
 
+    if (errorsPretty.length === 0) {
+      errorsPretty.push(message);
+    }
+
     return { message, errorsPretty, extensions };
   },
 });

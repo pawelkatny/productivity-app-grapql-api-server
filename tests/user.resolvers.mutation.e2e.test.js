@@ -1,4 +1,4 @@
-const apolloHttpServer = require("../src/helpers/mockApolloHttpServer");
+const apolloHttpServer = require("../tests_helpers/mockApolloHttpServer");
 const request = require("supertest");
 const context = require("../src/context");
 const { jwt } = require("../src/helpers");
@@ -8,6 +8,13 @@ let server, url;
 
 const bearer = "Bearer eyJhbGciOiJIUzI1NiJ9";
 
+const mockUserInputData = {
+  email: "test@email.com",
+  name: "Johny",
+  password: "paS$w0rd",
+  lastLoginDate: new Date(),
+};
+
 const mockUserUpdateData = {
   name: "John",
   settings: {
@@ -15,6 +22,14 @@ const mockUserUpdateData = {
     taskRequestLimit: 100,
   },
 };
+
+jest.mock("../src/loaders/redis", () => {
+  return {
+    get: jest.fn(),
+  };
+});
+
+const redis = require("../src/loaders/redis");
 
 beforeAll(async () => {
   ({ server, url } = await apolloHttpServer.create());
@@ -47,8 +62,12 @@ describe("User resolver e2e", () => {
   });
   describe("changeUserPassword", () => {
     it("should throw error if user is not found", async () => {
-      jest.spyOn(jwt, "verify").mockImplementationOnce(() => true);
+      const { _id } = new context.db.User(mockUserInputData);
+      jest.spyOn(jwt, "verify").mockImplementationOnce(() => {
+        return { userId: _id };
+      });
       jest.spyOn(context.db.User, "findOne").mockImplementationOnce(() => null);
+      jest.spyOn(redis, "get").mockImplementationOnce(() => _id);
 
       const queryData = {
         query: `

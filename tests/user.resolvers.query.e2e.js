@@ -1,4 +1,4 @@
-const apolloHttpServer = require("../src/helpers/mockApolloHttpServer");
+const apolloHttpServer = require("../tests_helpers/mockApolloHttpServer");
 const request = require("supertest");
 const { StatusCodes } = require("http-status-codes");
 let server, url;

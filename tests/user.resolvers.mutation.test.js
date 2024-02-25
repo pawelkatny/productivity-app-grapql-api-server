@@ -1,11 +1,10 @@
-const apolloServer = require("../src/helpers/mockApolloServer");
-const dbServer = require("../src/helpers/mockDbServer");
+const apolloServer = require("../tests_helpers/mockApolloServer");
+const dbServer = require("../tests_helpers/mockDbServer");
 const context = require("../src/context");
 const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { jwt } = require("../src/helpers");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
-const CustomGraphQLerror = require("../src/error/customError");
 
 let server;
 
@@ -14,6 +13,10 @@ jest.mock("../src/config", () => ({
   JWT_SECRET: "secret",
   JWT_EXPIRATION: "1h",
 }));
+
+jest.mock("../src/loaders/redis", () => {
+  return jest.fn();
+});
 
 afterEach(() => {
   jest.restoreAllMocks();

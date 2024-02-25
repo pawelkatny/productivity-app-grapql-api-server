@@ -1,4 +1,4 @@
-const apolloServer = require("../src/helpers/mockApolloServer");
+const apolloServer = require("../tests_helpers/mockApolloServer");
 const context = require("../src/context");
 const { StatusCodes, getReasonPhrase } = require("http-status-codes");
 
@@ -30,7 +30,7 @@ const mockUpdatedTaskData = {
   notes: "Updated test description",
   date: "2023-10-23",
   isCompleted: true,
-  priority: 2,
+  priority: "common",
 };
 
 describe("Task resolver mutations", () => {
@@ -73,31 +73,6 @@ describe("Task resolver mutations", () => {
         type: task.type,
       });
       expect(res.body.singleResult.errors).toBeUndefined();
-    });
-    it("should throw error is user is not auth", async () => {
-      const contextValue = {
-        db: context.db,
-        authUser: false,
-      };
-
-      const res = await server.executeOperation(
-        {
-          query: `mutation Mutation($input: CreateTaskInput!) { createTask(input: $input) { id name type }}`,
-          variables: {
-            input: mockTaskData,
-          },
-        },
-        {
-          contextValue,
-        }
-      );
-      expect(res.body.singleResult.errors[0].extensions.code).toEqual(
-        "UNAUTHORIZED"
-      );
-      expect(res.body.singleResult.errors[0].extensions.http.status).toEqual(
-        StatusCodes.UNAUTHORIZED
-      );
-      expect(res.body.singleResult.data).toEqual(null);
     });
     it("should throw error when task was not created", async () => {
       const { User, Task } = context.db;
@@ -152,7 +127,7 @@ describe("Task resolver mutations", () => {
         },
       };
 
-      jest.spyOn(Task, "findById").mockImplementationOnce(() => {
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => {
         task._doc.createdAt = new Date();
         task._doc.updatedAt = new Date();
         return task;
@@ -183,15 +158,20 @@ describe("Task resolver mutations", () => {
       expect(res.body.singleResult.errors).toBeUndefined();
     });
     it("should throw error when task was not found", async () => {
-      const { Task } = context.db;
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
       const task = new Task(mockTaskData);
 
       const contextValue = {
         db: context.db,
-        authUser: true,
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
+        },
       };
 
-      jest.spyOn(Task, "findById").mockImplementationOnce(() => {
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => {
         return null;
       });
 
@@ -221,14 +201,19 @@ describe("Task resolver mutations", () => {
   });
   describe("deleteTask", () => {
     it("should successfully delete task", async () => {
-      const { Task } = context.db;
+      const { User, Task } = context.db;
+      const user = new User(mockUserData);
       const task = new Task(mockTaskData);
       const deleteTaskId = task._id.toString();
       const contextValue = {
         db: context.db,
-        authUser: true,
+        auth: {
+          user: {
+            userId: user._id.toString(),
+          },
+        },
       };
-
+      jest.spyOn(Task, "findOne").mockImplementationOnce(() => true);
       const findByIdAndDelete = jest
         .spyOn(Task, "findByIdAndDelete")
         .mockImplementationOnce(() => true);

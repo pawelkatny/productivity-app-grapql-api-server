@@ -48,7 +48,10 @@ const taskSchema = mongoose.Schema(
       type: Number,
       enum: [1, 2, 3, 4],
       default: 1,
-      set: (p) => taskPriority[p],
+      set: (p) => {
+        const priority = taskPriority[p] || p;
+        return priority;
+      },
       get: (p) => {
         return Object.keys(taskPriority).find((key) => taskPriority[key] === p);
       },
@@ -106,10 +109,12 @@ taskSchema.statics.getSingleList = async (params, authUser) => {
   };
 
   const tasksCount = await Task.countDocuments(searchParams);
+  const toSkip = (page - 1) * taskRequestLimit;
   const tasks = await Task.find(searchParams)
-    .skip(page - 1)
-    .limit(taskRequestLimit)
-    .sort({ priority: "asc" });
+    .sort({ priority: "asc" })
+    .skip(toSkip)
+    .limit(taskRequestLimit);
+
   const nextPage = page * taskRequestLimit >= tasksCount ? 0 : page + 1;
   const tasksMapped = tasks.map((task) => prepareTaskTypeObject(task));
 
@@ -212,6 +217,19 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
             },
           },
         },
+        page: 1,
+      },
+    },
+    {
+      $set: {
+        tasks: {
+          $sortArray: {
+            input: "$tasks",
+            sortBy: {
+              priority: -1,
+            },
+          },
+        },
       },
     },
     {
@@ -220,9 +238,6 @@ taskSchema.statics.getAggregatedList = async (params, authUser) => {
         date: "$_id",
         tasks: {
           $slice: ["$tasks", 0, taskRequestLimit],
-        },
-        tasks: {
-          $sortArray: { input: "$tasks", sortBy: { priority: 1 } },
         },
         count: "$count",
         page: 1,
